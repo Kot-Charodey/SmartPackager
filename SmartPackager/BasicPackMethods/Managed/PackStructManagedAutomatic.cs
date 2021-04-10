@@ -14,50 +14,50 @@ namespace SmartPackager.BasicPackMethods.Managed
 {
     public static class PackStructManagedAutomaticExtension
     {
-        private delegate void delegate_PackGenerator(out Delegate_GetSize action_GetSize, out Delegate_Action_PackUP action_PackUP, out Delegate_UnPack action_UnPack);
+        internal unsafe delegate long Delegate_GetSize<T>(T source);
+        internal unsafe delegate long Delegate_Action_PackUP<T>(byte* destination, T sourcen);
+        internal unsafe delegate long Delegate_UnPack<T>(byte* source, out T destination);
 
-        internal unsafe delegate long Delegate_GetSize(object source);
-        internal unsafe delegate long Delegate_Action_PackUP(byte* destination, object sourcen);
-        internal unsafe delegate long Delegate_UnPack(byte* source, out object destination);
+        private delegate void delegate_PackGenerator<T>(out Delegate_GetSize<T> action_GetSize, out Delegate_Action_PackUP<T> action_PackUP, out Delegate_UnPack<T> action_UnPack);
 
         private static MethodInfo GetMethods_MethodInfo => typeof(Pack).GetMethod("GetMethods");
         private static MethodInfo PackArray_MethodInfo => typeof(PackStructManagedAutomaticExtension).GetMethod("PackArray", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructManagedAutomaticExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
-        internal static Dictionary<Type, IPackagerMethod> Cash = new Dictionary<Type, IPackagerMethod>();
+        private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructManagedAutomaticExtension).GetMethod("GetPackForType", BindingFlags.NonPublic | BindingFlags.Static);
+        internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
         /// <summary>
         /// Tries to create an unpacking method for a managed type
         /// </summary>
         /// <param name="type">Target type</param>
         /// <returns></returns>
-        public static IPackagerMethod Make(Type type)
+        public static IPackagerMethodGeneric Make<T>()
         {
-            if (Cash.TryGetValue(type, out IPackagerMethod packager))
+            if (Cash.TryGetValue(typeof(T), out IPackagerMethodGeneric packager))
             {
                 return packager;
             }
 
-            if (type.IsUnManaged() == true)
+            if (typeof(T).IsUnManaged() == true)
                 throw new Exception("This type is unmanaged!");
 
+            //бух
+            MethodInfo mi = GetPackFromType_MethodInfo.MakeGenericMethod(typeof(T));
+            IPackagerMethodGeneric pack = (IPackagerMethodGeneric)mi.Invoke(null, null);
 
-            MethodInfo mi = GetPackFromType_MethodInfo.MakeGenericMethod(type);
-            IPackagerMethod pack = (IPackagerMethod)mi.Invoke(null, null);
-
-            Cash.Add(type, pack);
+            Cash.Add(typeof(T), pack);
             return pack;
         }
 
-        private static IPackagerMethod GetPackFromType<T>()
+        private static IPackagerMethodGeneric GetPackForType<T>()
         {
-            Delegate_GetSize action_GetSize;
-            Delegate_Action_PackUP action_PackUP;
-            Delegate_UnPack action_UnPack;
+            Delegate_GetSize<T> action_GetSize;
+            Delegate_Action_PackUP<T> action_PackUP;
+            Delegate_UnPack<T> action_UnPack;
 
             if (typeof(T).IsArray)
             {
                 MethodInfo mi = PackArray_MethodInfo.MakeGenericMethod(typeof(T), typeof(T).GetElementType());
-                delegate_PackGenerator dpa = (delegate_PackGenerator)mi.CreateDelegate(typeof(delegate_PackGenerator));
+                delegate_PackGenerator<T> dpa = (delegate_PackGenerator<T>)mi.CreateDelegate(typeof(delegate_PackGenerator<T>));
 
                 dpa.Invoke(out action_GetSize, out action_PackUP, out action_UnPack);
             }
@@ -70,12 +70,12 @@ namespace SmartPackager.BasicPackMethods.Managed
         }
 
         private static unsafe void PackArray<TArray, TElement>(
-            out Delegate_GetSize action_GetSize,
-            out Delegate_Action_PackUP action_PackUP,
-            out Delegate_UnPack action_UnPack)
+            out Delegate_GetSize<TArray> action_GetSize,
+            out Delegate_Action_PackUP<TArray> action_PackUP,
+            out Delegate_UnPack<TArray> action_UnPack)
         {
             Type elementType = typeof(TElement);
-            IPackagerMethod pack = Pack.GetMethods<TElement>();
+            IPackagerMethod<TElement> pack = (IPackagerMethod<TElement>)Pack.GetMethods<TElement>();
 
             if (typeof(TArray).GetArrayRank() == 1)
             {
@@ -83,17 +83,17 @@ namespace SmartPackager.BasicPackMethods.Managed
                 {
                     int elementSize = Marshal.SizeOf(elementType);
 
-                    action_GetSize = (object source) =>
+                    action_GetSize = (TArray source) =>
                     {
-                        return ((TElement[])source).Length * elementSize + sizeof(int);
+                        return (source as TElement[]).Length * elementSize + sizeof(int);
                     };
                 }
                 else
                 {
-                    action_GetSize = (object source) =>
+                    action_GetSize = (TArray source) =>
                     {
                         long size = sizeof(int);
-                        TElement[] array = (TElement[])source;
+                        TElement[] array = source as TElement[];
 
                         int length = array.Length;
                         for (int i = 0; i < length; i++)
@@ -105,9 +105,9 @@ namespace SmartPackager.BasicPackMethods.Managed
                     };
                 }
 
-                action_PackUP = (byte* destination, object source) =>
+                action_PackUP = (byte* destination, TArray source) =>
                 {
-                    TElement[] array = (TElement[])source;
+                    TElement[] array = source as TElement[];
                     int length = array.Length;
 
                     *(int*)destination = length;
@@ -126,7 +126,7 @@ namespace SmartPackager.BasicPackMethods.Managed
                     return size;
                 };
 
-                action_UnPack = (byte* source, out object destination) =>
+                action_UnPack = (byte* source, out TArray destination) =>
                 {
                     int length = *(int*)source;
                     source += sizeof(int);
@@ -138,13 +138,12 @@ namespace SmartPackager.BasicPackMethods.Managed
 
                     for (int i = 0; i < length; i++)
                     {
-                        tmSize = pack.UnPack(source, out object tmData);
-                        array[i] = (TElement)tmData;
+                        tmSize = pack.UnPack(source, out array[i]);
                         source += tmSize;
                         size += tmSize;
                     }
 
-                    destination = array;
+                    destination = (TArray)(object)array;
 
                     return size;
                 };
@@ -161,26 +160,26 @@ namespace SmartPackager.BasicPackMethods.Managed
     /// Automatic packer of managed simple types and classes
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PackStructManagedAutomatic<T> : IPackagerMethod
+    public class PackStructManagedAutomatic<T> : IPackagerMethod<T>, IPackagerMethodGeneric
     {
 
         public Type TargetType => typeof(T);
 
-        private readonly Delegate_GetSize Action_GetSize;
-        private readonly Delegate_Action_PackUP Action_PackUP;
-        private readonly Delegate_UnPack Action_UnPack;
+        private readonly Delegate_GetSize<T> Action_GetSize;
+        private readonly Delegate_Action_PackUP<T> Action_PackUP;
+        private readonly Delegate_UnPack<T> Action_UnPack;
 
-        internal PackStructManagedAutomatic(Delegate_GetSize action_GetSize, Delegate_Action_PackUP action_PackUP, Delegate_UnPack action_UnPack)
+        internal PackStructManagedAutomatic(Delegate_GetSize<T> action_GetSize, Delegate_Action_PackUP<T> action_PackUP, Delegate_UnPack<T> action_UnPack)
         {
             Action_GetSize = action_GetSize;
             Action_PackUP = action_PackUP;
             Action_UnPack = action_UnPack;
         }
 
-        public long GetSize(object source) => Action_GetSize.Invoke(source);
+        public long GetSize(T source) => Action_GetSize.Invoke(source);
 
-        public unsafe long PackUP(byte* destination, object source) => Action_PackUP.Invoke(destination, source);
+        public unsafe long PackUP(byte* destination, T source) => Action_PackUP.Invoke(destination, source);
 
-        public unsafe long UnPack(byte* source, out object destination) => Action_UnPack.Invoke(source, out destination);
+        public unsafe long UnPack(byte* source, out T destination) => Action_UnPack.Invoke(source, out destination);
     }
 }

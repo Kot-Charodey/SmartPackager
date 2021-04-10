@@ -7,29 +7,28 @@ namespace SmartPackager
     /// </summary>
     public class Pack
     {
-        internal IPackagerMethod[] PackFunction;
+        internal IPackagerMethodGeneric[] PackFunction;
 
         /// <summary>
         /// Searches for or tries to create a packing method for the specified type
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IPackagerMethod GetMethods<T>()
+        public static IPackagerMethodGeneric GetMethods<T>()
         {
             if (typeof(T).IsUnManaged())
             {
-                return BasicPackMethods.PackStructUnmanagedExtension.Make(typeof(T));
+                return BasicPackMethods.PackStructUnmanagedExtension.Make<T>();
             }
             else
             {
                 //searches for a method implementation for this type or tries to generate
-                IPackagerMethod ipm;
-                if (PackMethods.PackMethodsDictionary.TryGetValue(typeof(T),out ipm)){
+                IPackagerMethodGeneric ipm;
+                if (PackMethods.PackMethodsDictionary.TryGetValue(typeof(T), out ipm))
+                {
                     return ipm;
                 }
-                ipm = BasicPackMethods.Managed.PackStructManagedAutomaticExtension.Make(typeof(T));
-                PackMethods.PackMethodsDictionary.Add(typeof(T), ipm);
-                return ipm;
+                return BasicPackMethods.Managed.PackStructManagedAutomaticExtension.Make<T>();
             }
         }
 
@@ -38,11 +37,11 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>()
                 }
             };
-            
+
             return pack;
         }
 
@@ -50,7 +49,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>()
 
@@ -63,7 +62,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -77,7 +76,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -92,7 +91,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -108,7 +107,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -125,7 +124,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -138,12 +137,12 @@ namespace SmartPackager
             };
             return pack;
         }
- 
+
         public static Pack Create<T1, T2, T3, T4, T5, T6, T7, T8>()
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -162,7 +161,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -182,7 +181,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -203,7 +202,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -225,7 +224,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -248,7 +247,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -272,7 +271,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -296,7 +295,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -322,7 +321,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -349,7 +348,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -377,7 +376,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -406,7 +405,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),
@@ -436,7 +435,7 @@ namespace SmartPackager
         {
             Pack pack = new Pack()
             {
-                PackFunction = new IPackagerMethod[] {
+                PackFunction = new IPackagerMethodGeneric[] {
                     GetMethods<T1>(),
                     GetMethods<T2>(),
                     GetMethods<T3>(),

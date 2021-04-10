@@ -2,26 +2,25 @@
 
 namespace SmartPackager.BasicPackMethods.Managed
 {
-    public class PackString : IPackagerMethod
+    public class PackString : IPackagerMethod<string>, IPackagerMethodGeneric
     {
         public Type TargetType => typeof(string);
 
-        public unsafe long PackUP(byte* destination, object source)
+        public unsafe long PackUP(byte* destination, string source)
         {
-            string data = (string)source;
-            *(int*)destination = data.Length;
+            *(int*)destination = source.Length;
             destination += sizeof(int);
 
-            for (int i = 0; i < data.Length; i++)
+            for (int i = 0; i < source.Length; i++)
             {
-                *(char*)destination = data[i];
+                *(char*)destination = source[i];
                 destination += sizeof(char);
             }
 
-            return data.Length * sizeof(char) + sizeof(int);
+            return source.Length * sizeof(char) + sizeof(int);
         }
 
-        public unsafe long UnPack(byte* source, out object destination)
+        public unsafe long UnPack(byte* source, out string destination)
         {
             int size = *(int*)source;
             source += sizeof(int);
@@ -37,9 +36,9 @@ namespace SmartPackager.BasicPackMethods.Managed
             return size * sizeof(char) + sizeof(int);
         }
 
-        public long GetSize(object source)
+        public long GetSize(string source)
         {
-            return ((string)source).Length * sizeof(char) + sizeof(int);
+            return source.Length * sizeof(char) + sizeof(int);
         }
     }
 }

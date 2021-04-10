@@ -47,6 +47,7 @@
     <Compile Include="BasicPackMethods\Managed\PackDateTime.cs" />
     <Compile Include="BasicPackMethods\Managed\PackStructManagedAutomatic.cs" />
     <Compile Include="BasicPackMethods\PackStructUnmanaged.cs" />
+    <Compile Include="IPackagerMethodGeneric.cs" />
     <Compile Include="Packager.cs" />
     <Compile Include="IPackagerMethod.cs" />
     <Compile Include="PackMethods.cs" />

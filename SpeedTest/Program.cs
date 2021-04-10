@@ -11,7 +11,7 @@ namespace SpeedTest
     class Program
     {
         public const int TestCount = 3;
-        public const int TestSize = 10000;
+        public const int TestSize = 100000;
 
         static void Main(string[] args)
         {
@@ -43,9 +43,7 @@ namespace SpeedTest
                 }
             }
 
-            object[] data_arr = { data };
-
-            Console.WriteLine($"Data size: {packager.CalcNeedSize(data_arr)}\n");
+            Console.WriteLine($"Data size: {packager.CalcNeedSize(data)}\n");
 
             for (int k = 0; k < TestCount; k++)
             {
@@ -54,9 +52,9 @@ namespace SpeedTest
                 stopwatch.Start();
                 for (int i = 0; i < TestSize; i++)
                 {
-                    byte[] bytes = new byte[packager.CalcNeedSize(data_arr)];
-                    packager.PackUP(bytes, 0, data_arr);
-                    object[] dataNew = packager.UnPack(bytes, 0);
+                    byte[] bytes = new byte[packager.CalcNeedSize(data)];
+                    packager.PackUP(bytes, 0, data);
+                    packager.UnPack(bytes, 0, out int[][][] t1);
                 }
                 stopwatch.Stop();
                 Console.WriteLine($"Time spent per unit: {stopwatch.Elapsed.TotalMilliseconds / TestSize} m/s");
@@ -78,9 +76,7 @@ namespace SpeedTest
                 data[i] = i;
             }
 
-            object[] data_arr = { data };
-
-            Console.WriteLine($"Data size: {packager.CalcNeedSize(data_arr)}\n");
+            Console.WriteLine($"Data size: {packager.CalcNeedSize(data)}\n");
 
             for (int k = 0; k < TestCount; k++)
             {
@@ -89,9 +85,9 @@ namespace SpeedTest
                 stopwatch.Start();
                 for (int i = 0; i < TestSize; i++)
                 {
-                    byte[] bytes = new byte[packager.CalcNeedSize(data_arr)];
-                    packager.PackUP(bytes, 0, data_arr);
-                    object[] dataNew = packager.UnPack(bytes, 0);
+                    byte[] bytes = new byte[packager.CalcNeedSize(data)];
+                    packager.PackUP(bytes, 0, data);
+                    packager.UnPack(bytes, 0, out int[] dd);
                 }
                 stopwatch.Stop();
                 Console.WriteLine($"Time spent per unit: {stopwatch.Elapsed.TotalMilliseconds / TestSize} m/s");
@@ -113,9 +109,7 @@ namespace SpeedTest
                 data[i] = i;
             }
 
-            object[] data_arr = { data };
-
-            Console.WriteLine($"Data size: {packager.CalcNeedSize(data_arr)}\n");
+            Console.WriteLine($"Data size: {packager.CalcNeedSize(data)}\n");
 
             for (int k = 0; k < TestCount; k++)
             {
@@ -124,9 +118,9 @@ namespace SpeedTest
                 stopwatch.Start();
                 for (int i = 0; i < TestSize; i++)
                 {
-                    byte[] bytes = new byte[packager.CalcNeedSize(data_arr)];
-                    packager.PackUP(bytes, 0, data_arr);
-                    object[] dataNew = packager.UnPack(bytes, 0);
+                    byte[] bytes = new byte[packager.CalcNeedSize(data)];
+                    packager.PackUP(bytes, 0, data);
+                    packager.UnPack(bytes, 0,out long[] dd);
                 }
                 stopwatch.Stop();
                 Console.WriteLine($"Time spent per unit: {stopwatch.Elapsed.TotalMilliseconds / TestSize} m/s");

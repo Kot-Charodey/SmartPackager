@@ -6,25 +6,25 @@ namespace SmartPackager
 {
     public static class PackMethods
     {
-        internal static Dictionary<Type, IPackagerMethod> PackMethodsDictionary = SetupPackMethods();
+        internal static Dictionary<Type, IPackagerMethodGeneric> PackMethodsDictionary = SetupPackMethods();
 
         /// <summary>
         /// loads data type packaging implementations
         /// </summary>
         /// <returns></returns>
-        private static Dictionary<Type, IPackagerMethod> SetupPackMethods()
+        private static Dictionary<Type, IPackagerMethodGeneric> SetupPackMethods()
         {
-            Dictionary<Type, IPackagerMethod> sm = new Dictionary<Type, IPackagerMethod>();
+            Dictionary<Type, IPackagerMethodGeneric> sm = new Dictionary<Type, IPackagerMethodGeneric>();
 
             //find IPackagerMethods
-            Type targetFind = typeof(IPackagerMethod);
+            Type targetFind = typeof(IPackagerMethodGeneric);
             var IPackagerMethods = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => targetFind.IsAssignableFrom(p) && targetFind != p);
 
             foreach (Type TypeIpm in IPackagerMethods)
             {
                 if (!TypeIpm.IsGenericType)
                 {
-                    IPackagerMethod ipm = Activator.CreateInstance(TypeIpm) as IPackagerMethod;
+                    IPackagerMethodGeneric ipm = Activator.CreateInstance(TypeIpm) as IPackagerMethodGeneric;
                     if (ipm == null)
                     {
                         throw new Exception("Failed to create " + TypeIpm.FullName);
@@ -56,7 +56,7 @@ namespace SmartPackager
         /// returns all packing methods *[unmanaged types generated automatically are not included]
         /// </summary>
         /// <returns>all packing methods</returns>
-        public static IPackagerMethod[] GetPackMethods()
+        public static IPackagerMethodGeneric[] GetPackMethods()
         {
             return PackMethodsDictionary.Values.ToArray();
         }
@@ -65,7 +65,16 @@ namespace SmartPackager
         /// Unmanaged types generated automatically
         /// </summary>
         /// <returns></returns>
-        public static IPackagerMethod[] GetPackagerMethodsUnmanagedTypes()
+        public static IPackagerMethodGeneric[] GetPackagerMethodsUnmanagedTypes()
+        {
+            return BasicPackMethods.PackStructUnmanagedExtension.Cash.Values.ToArray();
+        }
+
+        /// <summary>
+        /// Managed types generaded automatically
+        /// </summary>
+        /// <returns></returns>
+        public static IPackagerMethodGeneric[] GetPackagerMethodsManagedTypes()
         {
             return BasicPackMethods.PackStructUnmanagedExtension.Cash.Values.ToArray();
         }

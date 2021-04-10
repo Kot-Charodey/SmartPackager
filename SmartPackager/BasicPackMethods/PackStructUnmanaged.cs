@@ -10,7 +10,7 @@ namespace SmartPackager.BasicPackMethods
     public static class PackStructUnmanagedExtension
     {
         private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructUnmanagedExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
-        internal static Dictionary<Type, IPackagerMethod> Cash = new Dictionary<Type, IPackagerMethod>();
+        internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
         /// <summary>
         /// Allows you to get a PackStructUnmanaged of the desired type 
@@ -18,30 +18,31 @@ namespace SmartPackager.BasicPackMethods
         /// </summary>
         /// <param name="type"> target type (unmanaged)</param>
         /// <returns></returns>
-        public static IPackagerMethod Make(Type type)
+        public static IPackagerMethodGeneric Make<T>()
         {
-            if (Cash.TryGetValue(type, out IPackagerMethod packager))
+            if (Cash.TryGetValue(typeof(T), out IPackagerMethodGeneric packager))
             {
                 return packager;
             }
 
-            if (type.IsUnManaged() == false)
+            if (typeof(T).IsUnManaged() == false)
                 throw new Exception("This type is not unmanaged!");
 
-            MethodInfo mi = GetPackFromType_MethodInfo.MakeGenericMethod(type);
+            //exception bypass - this type must be unmanaged
+            MethodInfo mi = GetPackFromType_MethodInfo.MakeGenericMethod(typeof(T));
+            IPackagerMethodGeneric pack = (IPackagerMethodGeneric)mi.Invoke(null, null);
 
-            IPackagerMethod pack = (IPackagerMethod)mi.Invoke(null, null);
-            Cash.Add(type, pack);
+            Cash.Add(typeof(T), pack);
             return pack;
         }
 
-        private static IPackagerMethod GetPackFromType<T>() where T : unmanaged
+        private static IPackagerMethodGeneric GetPackFromType<T>() where T : unmanaged
         {
             return new PackStructUnmanaged<T>();
         }
     }
 
-    public class PackStructUnmanaged<T> : IPackagerMethod where T : unmanaged
+    public class PackStructUnmanaged<T> : IPackagerMethod<T>, IPackagerMethodGeneric where T : unmanaged
     {
         public Type TargetType => typeof(T);
 
@@ -50,20 +51,20 @@ namespace SmartPackager.BasicPackMethods
 
         }
 
-        public unsafe long PackUP(byte* destination, object source)
+        public unsafe long PackUP(byte* destination, T source)
         {
             *(T*)destination = (T)source;
             return sizeof(T);
         }
 
-        public unsafe long UnPack(byte* source, out object destination)
+        public unsafe long UnPack(byte* source, out T destination)
         {
             T pt = *(T*)source;
             destination = pt;
             return sizeof(T);
         }
 
-        public unsafe long GetSize(object source)
+        public unsafe long GetSize(T source)
         {
             return sizeof(T);
         }
