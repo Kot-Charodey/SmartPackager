@@ -53,14 +53,13 @@ namespace SmartPackager.BasicPackMethods
 
         public unsafe long PackUP(byte* destination, T source)
         {
-            *(T*)destination = (T)source;
+            *(T*)destination = source;
             return sizeof(T);
         }
 
         public unsafe long UnPack(byte* source, out T destination)
         {
-            T pt = *(T*)source;
-            destination = pt;
+            destination = *(T*)source;
             return sizeof(T);
         }
 
