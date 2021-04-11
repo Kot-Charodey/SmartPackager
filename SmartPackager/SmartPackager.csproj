@@ -43,14 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicPackMethods\Managed\PackString.cs" />
-    <Compile Include="BasicPackMethods\Managed\PackDateTime.cs" />
-    <Compile Include="BasicPackMethods\Managed\PackStructManagedAutomatic.cs" />
-    <Compile Include="BasicPackMethods\PackStructUnmanaged.cs" />
+    <Compile Include="BasicPackMethods\ManagedAutomatic\PackStructManagedAutomaticExtension_Container.cs" />
+    <Compile Include="BasicPackMethods\ManagedAutomatic\PackStructManagedAutomaticExtension_PackArray.cs" />
+    <Compile Include="BasicPackMethods\PackString.cs" />
+    <Compile Include="BasicPackMethods\PackDateTime.cs" />
+    <Compile Include="BasicPackMethods\ManagedAutomatic\PackStructManagedAutomatic.cs" />
+    <Compile Include="BasicPackMethods\ManagedAutomatic\PackStructManagedAutomaticExtension_Main.cs" />
+    <Compile Include="BasicPackMethods\PackStructUnmanagedAutomatic.cs" />
     <Compile Include="IPackagerMethodGeneric.cs" />
     <Compile Include="Packager.cs" />
     <Compile Include="IPackagerMethod.cs" />
     <Compile Include="PackMethods.cs" />
+    <Compile Include="BasicPackMethods\PackStructUnmanagedAutomaticExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pack.cs" />
     <Compile Include="UnmanagedTypeExtensios.cs" />

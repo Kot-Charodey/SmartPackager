@@ -67,7 +67,7 @@ namespace SmartPackager
         /// <returns></returns>
         public static IPackagerMethodGeneric[] GetPackagerMethodsUnmanagedTypes()
         {
-            return BasicPackMethods.PackStructUnmanagedExtension.Cash.Values.ToArray();
+            return BasicPackMethods.PackStructUnmanagedAutomaticExtension.Cash.Values.ToArray();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SmartPackager
         /// <returns></returns>
         public static IPackagerMethodGeneric[] GetPackagerMethodsManagedTypes()
         {
-            return BasicPackMethods.PackStructUnmanagedExtension.Cash.Values.ToArray();
+            return BasicPackMethods.PackStructManagedAutomaticExtension.Cash.Values.ToArray();
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 
-namespace SmartPackager.BasicPackMethods.Managed
+namespace SmartPackager.BasicPackMethods
 {
-    public class PackDateTime : IPackagerMethod<DateTime>, IPackagerMethodGeneric
+    public class PackDateTime : IPackagerMethod<DateTime>
     {
         public Type TargetType => typeof(DateTime);
+
+        public bool IsFixedSize => true;
 
         public unsafe long PackUP(byte* destination, DateTime source)
         {

@@ -1,10 +1,12 @@
 ﻿using System;
 
-namespace SmartPackager.BasicPackMethods.Managed
+namespace SmartPackager.BasicPackMethods
 {
-    public class PackString : IPackagerMethod<string>, IPackagerMethodGeneric
+    public class PackString : IPackagerMethod<string>
     {
         public Type TargetType => typeof(string);
+
+        public bool IsFixedSize => false;
 
         public unsafe long PackUP(byte* destination, string source)
         {

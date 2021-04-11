@@ -18,7 +18,7 @@ namespace SmartPackager
         {
             if (typeof(T).IsUnManaged())
             {
-                return BasicPackMethods.PackStructUnmanagedExtension.Make<T>();
+                return BasicPackMethods.PackStructUnmanagedAutomaticExtension.Make<T>();
             }
             else
             {
@@ -28,7 +28,7 @@ namespace SmartPackager
                 {
                     return ipm;
                 }
-                return BasicPackMethods.Managed.PackStructManagedAutomaticExtension.Make<T>();
+                return BasicPackMethods.PackStructManagedAutomaticExtension.Make<T>();
             }
         }
 

@@ -7,9 +7,9 @@ namespace SmartPackager.BasicPackMethods
     /// <summary>
     /// allows you to get a PackStructUnmanaged of the desired type
     /// </summary>
-    public static class PackStructUnmanagedExtension
+    public static class PackStructUnmanagedAutomaticExtension
     {
-        private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructUnmanagedExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
+        private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructUnmanagedAutomaticExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
         internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
         /// <summary>
@@ -38,34 +38,7 @@ namespace SmartPackager.BasicPackMethods
 
         private static IPackagerMethodGeneric GetPackFromType<T>() where T : unmanaged
         {
-            return new PackStructUnmanaged<T>();
-        }
-    }
-
-    public class PackStructUnmanaged<T> : IPackagerMethod<T>, IPackagerMethodGeneric where T : unmanaged
-    {
-        public Type TargetType => typeof(T);
-
-        internal PackStructUnmanaged()
-        {
-
-        }
-
-        public unsafe long PackUP(byte* destination, T source)
-        {
-            *(T*)destination = source;
-            return sizeof(T);
-        }
-
-        public unsafe long UnPack(byte* source, out T destination)
-        {
-            destination = *(T*)source;
-            return sizeof(T);
-        }
-
-        public unsafe long GetSize(T source)
-        {
-            return sizeof(T);
+            return new PackStructUnmanagedAutomatic<T>();
         }
     }
 }

@@ -2,13 +2,8 @@
 
 namespace SmartPackager
 {
-    public unsafe interface IPackagerMethod<T>
+    public unsafe interface IPackagerMethod<T> : IPackagerMethodGeneric
     {
-        /// <summary>
-        /// Target Type
-        /// </summary>
-        Type TargetType { get; }
-
         /// <summary>
         /// packs an object into an array of bytes
         /// </summary>
