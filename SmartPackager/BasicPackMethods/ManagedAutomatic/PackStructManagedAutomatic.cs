@@ -8,7 +8,7 @@ namespace SmartPackager.BasicPackMethods
     /// Automatic packer of managed simple types and classes
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PackStructManagedAutomatic<T> : IPackagerMethod<T>
+    internal class PackStructManagedAutomatic<T> : IPackagerMethod<T>
     {
         public Type TargetType => typeof(T);
 

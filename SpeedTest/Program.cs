@@ -26,7 +26,7 @@ namespace SpeedTest
             Console.WriteLine("Test int[16][16][16]");
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-            Packager packager = new Packager(Pack.Create<int[][][]>());
+            var packager = Packager.Create<int[][][]>();
 
             int[][][] data = new int[16][][];
 
@@ -52,8 +52,7 @@ namespace SpeedTest
                 stopwatch.Start();
                 for (int i = 0; i < TestSize; i++)
                 {
-                    byte[] bytes = new byte[packager.CalcNeedSize(data)];
-                    packager.PackUP(bytes, 0, data);
+                    byte[] bytes = packager.PackUP(data);
                     packager.UnPack(bytes, 0, out int[][][] t1);
                 }
                 stopwatch.Stop();
@@ -67,7 +66,7 @@ namespace SpeedTest
             Console.WriteLine($"Test int[{16 * 16 * 16}]");
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-            Packager packager = new Packager(Pack.Create<int[]>());
+            var packager = Packager.Create<int[]>();
 
             int[] data = new int[16*16*16];
 
@@ -85,8 +84,7 @@ namespace SpeedTest
                 stopwatch.Start();
                 for (int i = 0; i < TestSize; i++)
                 {
-                    byte[] bytes = new byte[packager.CalcNeedSize(data)];
-                    packager.PackUP(bytes, 0, data);
+                    byte[] bytes = packager.PackUP(data);
                     packager.UnPack(bytes, 0, out int[] dd);
                 }
                 stopwatch.Stop();
@@ -100,7 +98,7 @@ namespace SpeedTest
             Console.WriteLine($"Test long[{16 * 16 * 16}]");
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-            Packager packager = new Packager(Pack.Create<long[]>());
+            var packager = Packager.Create<long[]>();
 
             long[] data = new long[16 * 16 * 16];
 
@@ -118,8 +116,7 @@ namespace SpeedTest
                 stopwatch.Start();
                 for (int i = 0; i < TestSize; i++)
                 {
-                    byte[] bytes = new byte[packager.CalcNeedSize(data)];
-                    packager.PackUP(bytes, 0, data);
+                    byte[] bytes = packager.PackUP(data);
                     packager.UnPack(bytes, 0,out long[] dd);
                 }
                 stopwatch.Stop();

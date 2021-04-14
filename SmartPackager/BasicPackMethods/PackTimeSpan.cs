@@ -2,26 +2,26 @@
 
 namespace SmartPackager.BasicPackMethods
 {
-    internal class PackDateTime : IPackagerMethod<DateTime>
+    internal class PackTimeSpan : IPackagerMethod<TimeSpan>
     {
-        public Type TargetType => typeof(DateTime);
+        public Type TargetType => typeof(TimeSpan);
 
         public bool IsFixedSize => true;
 
-        public unsafe long PackUP(byte* destination, DateTime source)
+        public unsafe long PackUP(byte* destination, TimeSpan source)
         {
             *(long*)destination = source.Ticks;
             return sizeof(long);
         }
 
-        public unsafe long UnPack(byte* source, out DateTime destination)
+        public unsafe long UnPack(byte* source, out TimeSpan destination)
         {
-            DateTime pt = new DateTime(*(long*)source);
+            TimeSpan pt = new TimeSpan(*(long*)source);
             destination = pt;
             return sizeof(long);
         }
 
-        public long GetSize(DateTime source)
+        public long GetSize(TimeSpan source)
         {
             return sizeof(long);
         }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using PSMAE = SmartPackager.BasicPackMethods.PackStructManagedAutomaticExtension;
 
 namespace SmartPackager.BasicPackMethods
 {
-    public static partial class PackStructManagedAutomaticExtension
+    internal static partial class PackStructManagedAutomaticExtension
     {
         private static MethodInfo UnsafeGetSizeFixed_MethodInfo => typeof(PSMAE).GetMethod("UnsafeGetSizeFixed", BindingFlags.NonPublic | BindingFlags.Static);
         private static MethodInfo UnsafePackUPFixed_MethodInfo => typeof(PSMAE).GetMethod("UnsafePackUPFixed", BindingFlags.NonPublic | BindingFlags.Static);
@@ -20,11 +19,11 @@ namespace SmartPackager.BasicPackMethods
         private static MethodInfo UnsafeUnPackDynamic_MethodInfo => typeof(PSMAE).GetMethod("UnsafeUnPackDynamic", BindingFlags.NonPublic | BindingFlags.Static);
 
 
-        private static unsafe MethodsData<TArray> PackArray<TArray, TElement>()
+        private static MethodsData<TArray> PackArray<TArray, TElement>()
         {
             MethodsData<TArray> md;
 
-            IPackagerMethod<TElement> pack = (IPackagerMethod<TElement>)Pack.GetMethods<TElement>();
+            IPackagerMethod<TElement> pack = Packager.GetMethods<TElement>();
 
             if (typeof(TArray).GetArrayRank() == 1)
             {
@@ -37,7 +36,7 @@ namespace SmartPackager.BasicPackMethods
 
             return md;
         }
-        private static unsafe MethodsData<TArray> PackArrayRankOne<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static MethodsData<TArray> PackArrayRankOne<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodsData<TArray> md = new MethodsData<TArray>();
 
@@ -70,7 +69,7 @@ namespace SmartPackager.BasicPackMethods
 
 
         #region Fixed
-        private static unsafe Delegate_GetSize<TArray> GetSizeFixed<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_GetSize<TArray> GetSizeFixed<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafeGetSizeFixed_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_GetSize<TArray>)mi.Invoke(null, new object[] { pack });
@@ -84,7 +83,7 @@ namespace SmartPackager.BasicPackMethods
                 return source.Length * elementSize + sizeof(int);
             };
         }
-        private static unsafe Delegate_PackUP<TArray> PackUPFixed<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_PackUP<TArray> PackUPFixed<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafePackUPFixed_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_PackUP<TArray>)mi.Invoke(null, new object[] { pack });
@@ -108,7 +107,7 @@ namespace SmartPackager.BasicPackMethods
                 return size;
             };
         }
-        private static unsafe Delegate_UnPack<TArray> UnPackFixed<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_UnPack<TArray> UnPackFixed<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafeUnPackFixed_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_UnPack<TArray>)mi.Invoke(null, new object[] { pack });
@@ -135,7 +134,7 @@ namespace SmartPackager.BasicPackMethods
         #endregion
 
         #region MemoryCopy
-        private static unsafe Delegate_PackUP<TArray> PackUPFixedMemoryCopy<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_PackUP<TArray> PackUPFixedMemoryCopy<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafePackUPFixedMemoryCopy_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_PackUP<TArray>)mi.Invoke(null, new object[] { pack });
@@ -151,14 +150,14 @@ namespace SmartPackager.BasicPackMethods
 
                 long size = pack.GetSize(default) * length;
 
-                fixed(void* ptr = &source[0])
+                fixed (void* ptr = &source[0])
                     Buffer.MemoryCopy(ptr, destination, size, size);
 
                 size += sizeof(int);
                 return size;
             };
         }
-        private static unsafe Delegate_UnPack<TArray> UnPackFixedMemoryCopy<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_UnPack<TArray> UnPackFixedMemoryCopy<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafeUnPackFixedMemoryCopy_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_UnPack<TArray>)mi.Invoke(null, new object[] { pack });
@@ -184,7 +183,7 @@ namespace SmartPackager.BasicPackMethods
         #endregion
 
         #region Dynamic
-        private static unsafe Delegate_GetSize<TArray> GetSizeDynamic<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_GetSize<TArray> GetSizeDynamic<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafeGetSizeDynamic_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_GetSize<TArray>)mi.Invoke(null, new object[] { pack });
@@ -204,7 +203,7 @@ namespace SmartPackager.BasicPackMethods
                 return size;
             };
         }
-        private static unsafe Delegate_PackUP<TArray> PackUPDynamic<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_PackUP<TArray> PackUPDynamic<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafePackUPDynamic_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_PackUP<TArray>)mi.Invoke(null, new object[] { pack });
@@ -231,7 +230,7 @@ namespace SmartPackager.BasicPackMethods
                 return size;
             };
         }
-        private static unsafe Delegate_UnPack<TArray> UnPackDynamic<TArray, TElement>(IPackagerMethod<TElement> pack)
+        private static Delegate_UnPack<TArray> UnPackDynamic<TArray, TElement>(IPackagerMethod<TElement> pack)
         {
             MethodInfo mi = UnsafeUnPackDynamic_MethodInfo.MakeGenericMethod(typeof(TElement));
             return (Delegate_UnPack<TArray>)mi.Invoke(null, new object[] { pack });

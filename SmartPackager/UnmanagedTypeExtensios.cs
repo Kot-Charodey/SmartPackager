@@ -13,7 +13,7 @@ namespace SmartPackager
         private static Dictionary<Type, bool> cachedTypes = new Dictionary<Type, bool>();
 
         /// <summary>
-        /// Сhecks if the type is managed
+        /// Checks if the type is managed
         /// </summary>
         /// <param name="t"></param>
         /// <returns>returned true if type is unmanaged</returns>

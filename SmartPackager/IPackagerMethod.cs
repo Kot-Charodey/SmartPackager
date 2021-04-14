@@ -2,27 +2,30 @@
 
 namespace SmartPackager
 {
+    /// <summary>
+    /// Defines the unpacking and packing methods for the selected type
+    /// </summary>
+    /// <typeparam name="T">target type</typeparam>
     public unsafe interface IPackagerMethod<T> : IPackagerMethodGeneric
     {
         /// <summary>
-        /// packs an object into an array of bytes
+        /// Packs an object into an array of bytes
         /// </summary>
         /// <param name="destination">pointer to the beginning of the recording</param>
         /// <param name="source">object to record</param>
         /// <returns>how many bytes were written</returns>
         long PackUP(byte* destination, T source);
         /// <summary>
-        /// unpacks an object from an array of bytes
+        /// Unpacks an object from an array of bytes
         /// </summary>
         /// <param name="source">pointer to the beginning of reading</param>
         /// <param name="destination">finished object</param>
         /// <returns>how many bytes were read</returns>
         long UnPack(byte* source, out T destination);
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="source">target</param>
-        /// <returns>object size in bytes</returns>
+        /// <returns>Object size in bytes</returns>
         long GetSize(T source);
     }
 }

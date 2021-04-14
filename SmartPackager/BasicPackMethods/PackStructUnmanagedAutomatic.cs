@@ -2,7 +2,7 @@
 
 namespace SmartPackager.BasicPackMethods
 {
-    public class PackStructUnmanagedAutomatic<T> : IPackagerMethod<T> where T : unmanaged
+    internal class PackStructUnmanagedAutomatic<T> : IPackagerMethod<T> where T : unmanaged
     {
         public Type TargetType => typeof(T);
 

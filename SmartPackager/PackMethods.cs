@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace SmartPackager
 {
+    /// <summary>
+    /// Searches for and initializes packaging methods
+    /// </summary>
     public static class PackMethods
     {
         internal static Dictionary<Type, IPackagerMethodGeneric> PackMethodsDictionary = SetupPackMethods();

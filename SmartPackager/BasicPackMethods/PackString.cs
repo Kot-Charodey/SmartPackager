@@ -2,7 +2,7 @@
 
 namespace SmartPackager.BasicPackMethods
 {
-    public class PackString : IPackagerMethod<string>
+    internal class PackString : IPackagerMethod<string>
     {
         public Type TargetType => typeof(string);
 

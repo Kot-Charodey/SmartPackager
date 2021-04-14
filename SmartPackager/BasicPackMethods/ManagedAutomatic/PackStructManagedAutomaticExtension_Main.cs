@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SmartPackager.BasicPackMethods
 {
-    public static partial class PackStructManagedAutomaticExtension
+    internal static partial class PackStructManagedAutomaticExtension
     {
         internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
@@ -22,7 +22,6 @@ namespace SmartPackager.BasicPackMethods
             public bool isFixedSize;
         }
 
-        private static MethodInfo GetMethods_MethodInfo => typeof(Pack).GetMethod("GetMethods");
         private static MethodInfo PackArray_MethodInfo => typeof(PackStructManagedAutomaticExtension).GetMethod("PackArray", BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
