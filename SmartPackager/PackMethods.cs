@@ -27,8 +27,7 @@ namespace SmartPackager
             {
                 if (!TypeIpm.IsGenericType)
                 {
-                    IPackagerMethodGeneric ipm = Activator.CreateInstance(TypeIpm) as IPackagerMethodGeneric;
-                    if (ipm == null)
+                    if (!(Activator.CreateInstance(TypeIpm) is IPackagerMethodGeneric ipm))
                     {
                         throw new Exception("Failed to create " + TypeIpm.FullName);
                     }
@@ -70,7 +69,7 @@ namespace SmartPackager
         /// <returns></returns>
         public static IPackagerMethodGeneric[] GetPackagerMethodsUnmanagedTypes()
         {
-            return BasicPackMethods.PackStructUnmanagedAutomaticExtension.Cash.Values.ToArray();
+            return Automatic.PackStructUnmanagedAutomaticExtension.Cash.Values.ToArray();
         }
 
         /// <summary>
@@ -79,7 +78,7 @@ namespace SmartPackager
         /// <returns></returns>
         public static IPackagerMethodGeneric[] GetPackagerMethodsManagedTypes()
         {
-            return BasicPackMethods.PackStructManagedAutomaticExtension.Cash.Values.ToArray();
+            return Automatic.PackStructManagedAutomaticExtension.Cash.Values.ToArray();
         }
     }
 }

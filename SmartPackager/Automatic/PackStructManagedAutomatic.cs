@@ -1,8 +1,8 @@
 ﻿using System;
 
-using static SmartPackager.BasicPackMethods.PackStructManagedAutomaticExtension;
+using static SmartPackager.Automatic.PackStructManagedAutomaticExtension;
 
-namespace SmartPackager.BasicPackMethods
+namespace SmartPackager.Automatic
 {
     /// <summary>
     /// Automatic packer of managed simple types and classes

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SmartPackager.BasicPackMethods
+namespace SmartPackager.Automatic
 {
     /// <summary>
     /// allows you to get a PackStructUnmanaged of the desired type
@@ -35,6 +35,7 @@ namespace SmartPackager.BasicPackMethods
             return pack;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
         private static IPackagerMethodGeneric GetPackFromType<T>() where T : unmanaged
         {
             return new PackStructUnmanagedAutomatic<T>();

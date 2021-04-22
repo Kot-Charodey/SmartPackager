@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmartPackager.BasicPackMethods
+namespace SmartPackager.Automatic
 {
     internal class PackStructUnmanagedAutomatic<T> : IPackagerMethod<T> where T : unmanaged
     {

@@ -2,14 +2,14 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace SmartPackager.BasicPackMethods
+namespace SmartPackager.Automatic
 {
     internal static partial class PackStructManagedAutomaticExtension
     {
-        internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
+        internal static readonly Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
         internal unsafe delegate long Delegate_GetSize<T>(T source);
-        internal unsafe delegate long Delegate_PackUP<T>(byte* destination, T sourcen);
+        internal unsafe delegate long Delegate_PackUP<T>(byte* destination, T source);
         internal unsafe delegate long Delegate_UnPack<T>(byte* source, out T destination);
 
         private delegate MethodsData<T> delegate_PackGenerator<T>();
@@ -21,6 +21,7 @@ namespace SmartPackager.BasicPackMethods
             public Delegate_UnPack<T> action_UnPack;
             public bool isFixedSize;
         }
+
 
         private static MethodInfo PackArray_MethodInfo => typeof(PackStructManagedAutomaticExtension).GetMethod("PackArray", BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -58,7 +59,7 @@ namespace SmartPackager.BasicPackMethods
             }
             else
             {
-                throw new NotImplementedException();
+                data = PackContainer<T>();
             }
 
             return new PackStructManagedAutomatic<T>(data.action_GetSize, data.action_PackUP, data.action_UnPack, data.isFixedSize);
