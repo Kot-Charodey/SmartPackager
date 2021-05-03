@@ -14,13 +14,13 @@ namespace SpeedTest
     class Program
     {
         public const int TestCount = 3;
-        public const int TestSize = 100000;
+        public const int TestSize = 1000;
 
         static void Main()
         {
-            TestIntArrArrArr16();
-            TestIntArr16_16_16();
-            TestLongArr16_16_16();
+            //TestIntArrArrArr16();
+            //TestIntArr16_16_16();
+            //TestLongArr16_16_16();
             TestIntClass();
             Console.ReadLine();
         }

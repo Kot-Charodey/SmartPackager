@@ -1,29 +1,30 @@
 ﻿using System;
+using SmartPackager;
 
 namespace Test
 {
     class Program
     {
-        class tt //size 1
+        public class Ag
         {
-            public int a; //size 4
-            public int[] b = { 1, 3, 4 }; //size 12 + 4 (Length)
-        }// 1 + 4 + 16 = 21 byte
+            public int gg;
+        }
 
         static void Main()
         {
-            tt t = new()
-            {
-                a = 1234
-            };
+            var packager = SmartPackager.Packager.Create<Ag>();
+            //размер переменной в байтах
+            Ag a = new();
+            a.gg = 123;
+            Console.WriteLine("Size: " + packager.CalcNeedSize(a));
+            //упаковать
+            byte[] data = packager.PackUP(a);
+            //распаковка
+            Console.WriteLine("Out:");
+            packager.UnPack(data,0,out Ag b);
+            Console.WriteLine(b.gg);
 
-            var packager = SmartPackager.Packager.Create<tt>();
-            Console.WriteLine("Size: "+packager.CalcNeedSize(t));
 
-            packager.UnPack(packager.PackUP(t),0,out tt res);
-            Console.WriteLine(res.a);
-                foreach(var bb in res.b)
-                 Console.Write(bb);
             Console.ReadLine();
         }
     }

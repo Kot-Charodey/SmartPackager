@@ -47,9 +47,9 @@ namespace SmartPackager.Automatic
             private static MethodInfo PackExtension_MethodInfo => typeof(Container).GetMethod("PackExtension", BindingFlags.NonPublic | BindingFlags.Static);
             private static MethodInfo CreateClass_MethodInfo => typeof(Container).GetMethod("CreateClass", BindingFlags.NonPublic | BindingFlags.Static);
 
-            private unsafe delegate void PackUp(ref byte* dest, object target, ref long size);
-            private unsafe delegate void UnPack(ref byte* sour, object target, ref long size);
-            private unsafe delegate void GetSize(object target, ref long size);
+            private unsafe delegate void PackUp(ref byte* dest, TypedReference target, ref long size);
+            private unsafe delegate void UnPack(ref byte* sour, TypedReference target, ref long size);
+            private unsafe delegate void GetSize(TypedReference target, ref long size);
             private delegate T Delegate_CreateClass<T>();
             private delegate bool Delegate_PackExtension(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi);
 
@@ -91,7 +91,8 @@ namespace SmartPackager.Automatic
                     data.action_PackUP = (byte* destination, TContainer source) =>
                     {
                         long size = 0;
-                        packUp.Invoke(ref destination, source, ref size);
+                        TypedReference reference = __makeref(source);
+                        packUp.Invoke(ref destination, reference, ref size);
 
                         return size;
                     };
@@ -100,7 +101,8 @@ namespace SmartPackager.Automatic
                     {
                         long size = 0;
                         destination = default;
-                        unPack.Invoke(ref source, destination, ref size);
+                        TypedReference reference = __makeref(destination);
+                        unPack.Invoke(ref source, reference, ref size);
 
                         return size;
                     };
@@ -122,7 +124,8 @@ namespace SmartPackager.Automatic
                             long size = 0;
                             if (source != null)
                             {
-                                getSize.Invoke(source, ref size);
+                                TypedReference reference = __makeref(source);
+                                getSize.Invoke(reference, ref size);
                             }
 
                             return size;
@@ -143,7 +146,8 @@ namespace SmartPackager.Automatic
                         {
                             *destination = 2;
                             destination += 1;
-                            packUp.Invoke(ref destination, source, ref size);
+                            TypedReference reference = __makeref(source);
+                            packUp.Invoke(ref destination, reference, ref size);
                         }
 
                         return size;
@@ -159,12 +163,13 @@ namespace SmartPackager.Automatic
                         switch (*(ContainerStatus*)source)
                         {
                             case ContainerStatus.empty:
-                                destination = default;
+                                destination = default;//null
                                 break;
                             case ContainerStatus.contains:
                                 source += 1;
                                 destination = createClass.Invoke();
-                                unPack.Invoke(ref source, destination, ref size);
+                                TypedReference reference = __makeref(destination);
+                                unPack.Invoke(ref source, reference, ref size);
                                 break;
                             default:
                                 throw new Exception("Invalid expression for unpacking");
@@ -176,7 +181,9 @@ namespace SmartPackager.Automatic
                     if (isFixedSize)
                     {
                         long clcSize = sizeof(byte);
-                        getSize.Invoke(createClass.Invoke(), ref clcSize);
+                        TContainer container = createClass.Invoke();
+                        TypedReference reference = __makeref(container);
+                        getSize.Invoke(reference, ref clcSize);
 
                         data.action_GetSize = (TContainer source) =>
                         {
@@ -190,7 +197,8 @@ namespace SmartPackager.Automatic
                             long size = sizeof(byte);
                             if (source != null)
                             {
-                                getSize.Invoke(source, ref size);
+                                TypedReference reference = __makeref(source);
+                                getSize.Invoke(reference, ref size);
                             }
 
                             return size;
@@ -209,25 +217,27 @@ namespace SmartPackager.Automatic
             private unsafe static bool PackExtension<T>(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi)
             {
                 IPackagerMethod<T> ipm = Packager.GetMethods<T>();
+                //var getter = FastGetSetValue.BuildUntypedGetter<T>(fi);
+                var setter = FastGetSetValue.BuildUntypedSetter<long>(fi);
 
-                packUP = (ref byte* destination, object target, ref long size) =>
+                packUP = (ref byte* destination, TypedReference target, ref long size) =>
                 {
-                    long s = ipm.PackUP(destination, (T)fi.GetValue(target));
+                    long s = ipm.PackUP(destination, (T)fi.GetValueDirect(target));
                     size += s;
                     destination += s;
                 };
 
-                unPack = (ref byte* sourse, object target, ref long size) =>
+                unPack = (ref byte* sourse, TypedReference target, ref long size) =>
                 {
                     long s = ipm.UnPack(sourse, out T targ);
                     size += s;
                     sourse += s;
-                    fi.SetValue(target, targ);
+                    fi.SetValueDirect(target, targ);
                 };
 
-                getSize = (object target, ref long size) =>
+                getSize = (TypedReference target, ref long size) =>
                 {
-                    size += ipm.GetSize((T)fi.GetValue(target));
+                    size += ipm.GetSize((T)fi.GetValueDirect(target));
                 };
 
                 return ipm.IsFixedSize;
