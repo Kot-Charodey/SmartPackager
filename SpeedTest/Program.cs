@@ -18,9 +18,9 @@ namespace SpeedTest
 
         static void Main()
         {
-            //TestIntArrArrArr16();
-            //TestIntArr16_16_16();
-            //TestLongArr16_16_16();
+            TestIntArrArrArr16();
+            TestIntArr16_16_16();
+            TestLongArr16_16_16();
             TestIntClass();
             Console.ReadLine();
         }

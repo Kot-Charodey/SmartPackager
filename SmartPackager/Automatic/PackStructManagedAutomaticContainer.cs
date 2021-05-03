@@ -51,13 +51,15 @@ namespace SmartPackager.Automatic
             private unsafe delegate void UnPack(ref byte* sour, object target, ref long size);
             private unsafe delegate void GetSize(object target, ref long size);
             private delegate T Delegate_CreateClass<T>();
-            private delegate void Delegate_PackExtension(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi);
+            private delegate bool Delegate_PackExtension(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi);
 
             public unsafe static void Pack<TContainer>(FieldInfo[] fields, ref MethodsData<TContainer> data)
             {
                 PackUp packUp = null;
                 UnPack unPack = null;
                 GetSize getSize = null;
+
+                bool isFixedSize = true;
 
                 for (int i = 0; i < fields.Length; i++)
                 {
@@ -67,7 +69,7 @@ namespace SmartPackager.Automatic
                         CashPackExtension_MethodInfo.Add(fields[i].FieldType, mi);
                     }
 
-                    ((Delegate_PackExtension)mi.CreateDelegate(typeof(Delegate_PackExtension))).Invoke(out PackUp up, out UnPack down, out GetSize gs, fields[i]);
+                    isFixedSize &= ((Delegate_PackExtension)mi.CreateDelegate(typeof(Delegate_PackExtension))).Invoke(out PackUp up, out UnPack down, out GetSize gs, fields[i]);
 
                     if (i == 0)
                     {
@@ -83,49 +85,70 @@ namespace SmartPackager.Automatic
                     }
                 }
 
-                data.action_PackUP = (byte* destination, TContainer source) =>
+                //if structure
+                if (typeof(TContainer).IsValueType)
                 {
-                    long size = sizeof(byte);
-
-                    if (source == null)
+                    data.action_PackUP = (byte* destination, TContainer source) =>
                     {
-                        *destination = 1;
+                        long size = 0;
+                        packUp.Invoke(ref destination, source, ref size);
+
+                        return size;
+                    };
+
+                    data.action_UnPack = (byte* source, out TContainer destination) =>
+                    {
+                        long size = 0;
+                        destination = default;
+                        unPack.Invoke(ref source, destination, ref size);
+
+                        return size;
+                    };
+
+                    if (isFixedSize)
+                    {
+                        long clcSize = 0;
+                        getSize.Invoke(default, ref clcSize);
+
+                        data.action_GetSize = (TContainer source) =>
+                        {
+                            return clcSize;
+                        };
                     }
                     else
                     {
-                        *destination = 2;
-                        destination += 1;
-                        packUp.Invoke(ref destination, source, ref size);
+                        data.action_GetSize = (TContainer source) =>
+                        {
+                            long size = 0;
+                            if (source != null)
+                            {
+                                getSize.Invoke(source, ref size);
+                            }
+
+                            return size;
+                        };
                     }
-
-                    return size = 1;
-                };
-
-                if (typeof(TContainer).IsValueType)
+                }
+                else //if class
                 {
-                    data.action_UnPack = (byte* source, out TContainer destination) =>
+                    data.action_PackUP = (byte* destination, TContainer source) =>
                     {
                         long size = sizeof(byte);
 
-                        switch (*(ContainerStatus*)source)
+                        if (source == null)
                         {
-                            case ContainerStatus.empty:
-                                destination = default;
-                                break;
-                            case ContainerStatus.contains:
-                                source += 1;
-                                destination = default;
-                                unPack.Invoke(ref source, destination, ref size);
-                                break;
-                            default:
-                                throw new Exception("Invalid expression for unpacking");
+                            *destination = 1;
+                        }
+                        else
+                        {
+                            *destination = 2;
+                            destination += 1;
+                            packUp.Invoke(ref destination, source, ref size);
                         }
 
                         return size;
                     };
-                }
-                else
-                {
+
                     MethodInfo mi = CreateClass_MethodInfo.MakeGenericMethod(typeof(TContainer));
                     Delegate_CreateClass<TContainer> createClass = (Delegate_CreateClass<TContainer>)mi.CreateDelegate(typeof(Delegate_CreateClass<TContainer>));
 
@@ -149,18 +172,31 @@ namespace SmartPackager.Automatic
 
                         return size;
                     };
-                }
 
-                data.action_GetSize = (TContainer source) =>
-                {
-                    long size = sizeof(byte);
-                    if (source != null)
+                    if (isFixedSize)
                     {
-                        getSize.Invoke(source, ref size);
-                    }
+                        long clcSize = sizeof(byte);
+                        getSize.Invoke(createClass.Invoke(), ref clcSize);
 
-                    return size;
-                };
+                        data.action_GetSize = (TContainer source) =>
+                        {
+                            return clcSize;
+                        };
+                    }
+                    else
+                    {
+                        data.action_GetSize = (TContainer source) =>
+                        {
+                            long size = sizeof(byte);
+                            if (source != null)
+                            {
+                                getSize.Invoke(source, ref size);
+                            }
+
+                            return size;
+                        };
+                    }
+                }
             }
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
@@ -170,7 +206,7 @@ namespace SmartPackager.Automatic
             }
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
-            private unsafe static void PackExtension<T>(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi)
+            private unsafe static bool PackExtension<T>(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi)
             {
                 IPackagerMethod<T> ipm = Packager.GetMethods<T>();
 
@@ -193,6 +229,8 @@ namespace SmartPackager.Automatic
                 {
                     size += ipm.GetSize((T)fi.GetValue(target));
                 };
+
+                return ipm.IsFixedSize;
             }
         }
     }
