@@ -45,7 +45,7 @@ namespace SmartPackager.Automatic
             var fields = 
                 from field in typeof(TContainer).GetFields(bindingFlags)
                 where !field.IsNotSerialized && !field.IsLiteral && !field.IsInitOnly && !field.IsStatic
-                where field.GetCustomAttribute<NotPack>() == null
+                where field.GetCustomAttribute<NotPackAttribute>() == null
                 where !field.Name.Contains("k__BackingField")
                 select (MemberInfo)field;
 
@@ -53,7 +53,7 @@ namespace SmartPackager.Automatic
                 from property in typeof(TContainer).GetProperties(bindingFlags)
                 where property.CanWrite && property.CanRead
                 where (property.GetGetMethod(false)) == null
-                where property.GetCustomAttribute<NotPack>() == null
+                where property.GetCustomAttribute<NotPackAttribute>() == null
                 where !property.IsStatic()
                 select (MemberInfo)property;
 
