@@ -10,20 +10,22 @@ namespace SmartPackager.Automatic
 {
     internal static class FastGetSetValue
     {
-        public static Func<T, object> BuildUntypedGetter<T>(MemberInfo memberInfo)
+        //https://stackoverflow.com/questions/17660097/is-it-possible-to-speed-this-method-up/17669142
+
+        public static Func<TContainer, TField> BuildUntypedGetter<TContainer, TField>(MemberInfo memberInfo)
         {
             var targetType = memberInfo.DeclaringType;
             var exInstance = Expression.Parameter(targetType, "t");
 
             var exMemberAccess = Expression.MakeMemberAccess(exInstance, memberInfo);       // t.PropertyName
-            var exConvertToObject = Expression.Convert(exMemberAccess, typeof(object));     // Convert(t.PropertyName, typeof(object))
-            var lambda = Expression.Lambda<Func<T, object>>(exConvertToObject, exInstance);
+            //var exConvertToObject = Expression.Convert(exMemberAccess, typeof(TField));     // Convert(t.PropertyName, typeof(object))
+            var lambda = Expression.Lambda<Func<TContainer, TField>>(exMemberAccess, exInstance);
 
             var action = lambda.Compile();
             return action;
         }
 
-        public static Action<T, object> BuildUntypedSetter<T>(MemberInfo memberInfo)
+        public static Action<TContainer, TField> BuildUntypedSetter<TContainer, TField>(MemberInfo memberInfo)
         {
             var targetType = memberInfo.DeclaringType;
             var exInstance = Expression.Parameter(targetType, "t");
@@ -31,16 +33,16 @@ namespace SmartPackager.Automatic
             var exMemberAccess = Expression.MakeMemberAccess(exInstance, memberInfo);
 
             // t.PropertValue(Convert(p))
-            var exValue = Expression.Parameter(typeof(object), "p");
-            var exConvertedValue = Expression.Convert(exValue, GetUnderlyingType(memberInfo));
-            var exBody = Expression.Assign(exMemberAccess, exConvertedValue);
+            var exValue = Expression.Parameter(typeof(TField), "p");
+            //var exConvertedValue = Expression.Convert(exValue, GetUnderlyingType(memberInfo));
+            var exBody = Expression.Assign(exMemberAccess, exValue);
 
-            var lambda = Expression.Lambda<Action<T, object>>(exBody, exInstance, exValue);
+            var lambda = Expression.Lambda<Action<TContainer, TField>>(exBody, exInstance, exValue);
             var action = lambda.Compile();
             return action;
         }
 
-        private static Type GetUnderlyingType(this MemberInfo member)
+        public static Type GetUnderlyingType(this MemberInfo member)
         {
             switch (member.MemberType)
             {

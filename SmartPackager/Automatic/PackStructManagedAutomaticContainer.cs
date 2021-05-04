@@ -19,6 +19,19 @@ namespace SmartPackager.Automatic
             contains,
         }
 
+        private static bool IsStatic(this PropertyInfo property)
+        {
+            var g1 = property.GetGetMethod(false);
+            var g2 = property.GetGetMethod(true);
+            var s1 = property.GetSetMethod(false);
+            var s2 = property.GetSetMethod(true);
+
+            return
+                (g1 != null && g1.IsStatic) || (g2.IsStatic) &&
+                (s1 != null && s1.IsStatic) || (s2.IsStatic);
+
+        }
+
         private static MethodsData<TContainer> PackContainer<TContainer>()
         {
             //throw new NotImplementedException();
@@ -27,15 +40,36 @@ namespace SmartPackager.Automatic
             SearchPrivateFieldsAttribute osfAttribute = typeof(TContainer).GetCustomAttribute<SearchPrivateFieldsAttribute>();
             BindingFlags bindingFlags = osfAttribute == null ? bindingFlagsDefault : bindingFlagsAll;
 
-            FieldInfo[] fields = (
+            //ищет свойства и поля
+
+            var fields = 
                 from field in typeof(TContainer).GetFields(bindingFlags)
                 where !field.IsNotSerialized && !field.IsLiteral && !field.IsInitOnly && !field.IsStatic
-                orderby field.Name ascending
-                select field
-                ).ToArray();
+                where field.GetCustomAttribute<NotPack>() == null
+                where !field.Name.Contains("k__BackingField")
+                select (MemberInfo)field;
+
+            var properties =
+                from property in typeof(TContainer).GetProperties(bindingFlags)
+                where property.CanWrite && property.CanRead
+                where (property.GetGetMethod(false)) == null
+                where property.GetCustomAttribute<NotPack>() == null
+                where !property.IsStatic()
+                select (MemberInfo)property;
+
+            MemberInfo[] memberInfo = (
+                from member in fields.Union(properties)
+                orderby member.Name ascending
+                select member).ToArray();
+
+
+            if (memberInfo.Length == 0)
+            {
+                throw new Exception("You cant't pack a void!");
+            }
 
             md.isFixedSize = true;
-            Container.Pack(fields, ref md);
+            Container.Pack(memberInfo, ref md);
 
             return md;
         }
@@ -43,33 +77,29 @@ namespace SmartPackager.Automatic
         // size + sizeof(byte); - null flag
         private static class Container
         {
-            private static readonly Dictionary<Type, MethodInfo> CashPackExtension_MethodInfo = new Dictionary<Type, MethodInfo>();
             private static MethodInfo PackExtension_MethodInfo => typeof(Container).GetMethod("PackExtension", BindingFlags.NonPublic | BindingFlags.Static);
             private static MethodInfo CreateClass_MethodInfo => typeof(Container).GetMethod("CreateClass", BindingFlags.NonPublic | BindingFlags.Static);
 
-            private unsafe delegate void PackUp(ref byte* dest, TypedReference target, ref long size);
-            private unsafe delegate void UnPack(ref byte* sour, TypedReference target, ref long size);
-            private unsafe delegate void GetSize(TypedReference target, ref long size);
+            private unsafe delegate void PackUp<TContainer>(ref byte* dest, in TContainer target, ref long size);
+            private unsafe delegate void UnPack<TContainer>(ref byte* sour, ref TContainer target, ref long size);
+            private unsafe delegate void GetSize<TContainer>(TContainer target, ref long size);
             private delegate T Delegate_CreateClass<T>();
-            private delegate bool Delegate_PackExtension(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi);
+            private delegate bool Delegate_PackExtension<TContainer>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo);
 
-            public unsafe static void Pack<TContainer>(FieldInfo[] fields, ref MethodsData<TContainer> data)
+            public unsafe static void Pack<TContainer>(MemberInfo[] memberInfo, ref MethodsData<TContainer> data)
             {
-                PackUp packUp = null;
-                UnPack unPack = null;
-                GetSize getSize = null;
+                PackUp<TContainer> packUp = null;
+                UnPack<TContainer> unPack = null;
+                GetSize<TContainer> getSize = null;
 
                 bool isFixedSize = true;
 
-                for (int i = 0; i < fields.Length; i++)
+                for (int i = 0; i < memberInfo.Length; i++)
                 {
-                    if (!CashPackExtension_MethodInfo.TryGetValue(fields[i].FieldType, out MethodInfo mi))
-                    {
-                        mi = PackExtension_MethodInfo.MakeGenericMethod(fields[i].FieldType);
-                        CashPackExtension_MethodInfo.Add(fields[i].FieldType, mi);
-                    }
+                    MethodInfo mi = PackExtension_MethodInfo.MakeGenericMethod(typeof(TContainer), memberInfo[i].GetUnderlyingType());
 
-                    isFixedSize &= ((Delegate_PackExtension)mi.CreateDelegate(typeof(Delegate_PackExtension))).Invoke(out PackUp up, out UnPack down, out GetSize gs, fields[i]);
+                    isFixedSize &= ((Delegate_PackExtension<TContainer>)mi.CreateDelegate(typeof(Delegate_PackExtension<TContainer>))).
+                        Invoke(out PackUp<TContainer> up, out UnPack<TContainer> down, out GetSize<TContainer> gs, memberInfo[i]);
 
                     if (i == 0)
                     {
@@ -91,8 +121,7 @@ namespace SmartPackager.Automatic
                     data.action_PackUP = (byte* destination, TContainer source) =>
                     {
                         long size = 0;
-                        TypedReference reference = __makeref(source);
-                        packUp.Invoke(ref destination, reference, ref size);
+                        packUp.Invoke(ref destination, source, ref size);
 
                         return size;
                     };
@@ -101,8 +130,7 @@ namespace SmartPackager.Automatic
                     {
                         long size = 0;
                         destination = default;
-                        TypedReference reference = __makeref(destination);
-                        unPack.Invoke(ref source, reference, ref size);
+                        unPack.Invoke(ref source, ref destination, ref size);
 
                         return size;
                     };
@@ -124,8 +152,7 @@ namespace SmartPackager.Automatic
                             long size = 0;
                             if (source != null)
                             {
-                                TypedReference reference = __makeref(source);
-                                getSize.Invoke(reference, ref size);
+                                getSize.Invoke(source, ref size);
                             }
 
                             return size;
@@ -146,8 +173,7 @@ namespace SmartPackager.Automatic
                         {
                             *destination = 2;
                             destination += 1;
-                            TypedReference reference = __makeref(source);
-                            packUp.Invoke(ref destination, reference, ref size);
+                            packUp.Invoke(ref destination, source, ref size);
                         }
 
                         return size;
@@ -168,8 +194,7 @@ namespace SmartPackager.Automatic
                             case ContainerStatus.contains:
                                 source += 1;
                                 destination = createClass.Invoke();
-                                TypedReference reference = __makeref(destination);
-                                unPack.Invoke(ref source, reference, ref size);
+                                unPack.Invoke(ref source, ref destination, ref size);
                                 break;
                             default:
                                 throw new Exception("Invalid expression for unpacking");
@@ -181,9 +206,7 @@ namespace SmartPackager.Automatic
                     if (isFixedSize)
                     {
                         long clcSize = sizeof(byte);
-                        TContainer container = createClass.Invoke();
-                        TypedReference reference = __makeref(container);
-                        getSize.Invoke(reference, ref clcSize);
+                        getSize.Invoke(createClass.Invoke(), ref clcSize);
 
                         data.action_GetSize = (TContainer source) =>
                         {
@@ -197,8 +220,7 @@ namespace SmartPackager.Automatic
                             long size = sizeof(byte);
                             if (source != null)
                             {
-                                TypedReference reference = __makeref(source);
-                                getSize.Invoke(reference, ref size);
+                                getSize.Invoke(source, ref size);
                             }
 
                             return size;
@@ -214,30 +236,30 @@ namespace SmartPackager.Automatic
             }
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
-            private unsafe static bool PackExtension<T>(out PackUp packUP, out UnPack unPack, out GetSize getSize, FieldInfo fi)
+            private unsafe static bool PackExtension<TContainer, TField>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo)
             {
-                IPackagerMethod<T> ipm = Packager.GetMethods<T>();
-                //var getter = FastGetSetValue.BuildUntypedGetter<T>(fi);
-                var setter = FastGetSetValue.BuildUntypedSetter<long>(fi);
+                IPackagerMethod<TField> ipm = Packager.GetMethods<TField>();
+                var getter = FastGetSetValue.BuildUntypedGetter<TContainer,TField>(memberInfo);
+                var setter = FastGetSetValue.BuildUntypedSetter<TContainer,TField>(memberInfo);
 
-                packUP = (ref byte* destination, TypedReference target, ref long size) =>
+                packUP = (ref byte* destination, in TContainer target, ref long size) =>
                 {
-                    long s = ipm.PackUP(destination, (T)fi.GetValueDirect(target));
+                    long s = ipm.PackUP(destination, getter(target));
                     size += s;
                     destination += s;
                 };
 
-                unPack = (ref byte* sourse, TypedReference target, ref long size) =>
+                unPack = (ref byte* sourse, ref TContainer target, ref long size) =>
                 {
-                    long s = ipm.UnPack(sourse, out T targ);
+                    long s = ipm.UnPack(sourse, out TField targ);
                     size += s;
                     sourse += s;
-                    fi.SetValueDirect(target, targ);
+                    setter(target, targ);
                 };
 
-                getSize = (TypedReference target, ref long size) =>
+                getSize = (TContainer target, ref long size) =>
                 {
-                    size += ipm.GetSize((T)fi.GetValueDirect(target));
+                    size += ipm.GetSize(getter(target));
                 };
 
                 return ipm.IsFixedSize;

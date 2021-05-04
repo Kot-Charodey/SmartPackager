@@ -14,7 +14,7 @@ namespace SpeedTest
     class Program
     {
         public const int TestCount = 3;
-        public const int TestSize = 1000;
+        public const int TestSize = 100000;
 
         static void Main()
         {
@@ -155,7 +155,7 @@ namespace SpeedTest
             }
         }
 
-        class IntClass
+        public class IntClass
         {
             public long a1f = 5;         public long a1f1 = 5;         public long a1f2 = 5;           public long a1f3 = 5;
             public long a2f = 5;         public long a2f1 = 5;         public long a2f2 = 5;           public long a2f3 = 5;

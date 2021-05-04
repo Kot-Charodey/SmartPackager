@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Automatic\FastGetSetValue.cs" />
+    <Compile Include="Automatic\NotPackAttribute.cs" />
     <Compile Include="Automatic\SearchPrivateFieldsAttribute.cs" />
     <Compile Include="Automatic\PackStructManagedAutomaticContainer.cs" />
     <Compile Include="Automatic\PackStructManagedAutomaticExtension_PackArray.cs" />
