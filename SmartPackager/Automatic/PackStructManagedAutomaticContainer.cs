@@ -254,7 +254,7 @@ namespace SmartPackager.Automatic
                     long s = ipm.UnPack(sourse, out TField targ);
                     size += s;
                     sourse += s;
-                    setter(target, targ);
+                    setter(ref target, targ);
                 };
 
                 getSize = (TContainer target, ref long size) =>

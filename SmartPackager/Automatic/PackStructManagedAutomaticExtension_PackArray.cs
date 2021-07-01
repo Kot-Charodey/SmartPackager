@@ -82,6 +82,7 @@ namespace SmartPackager.Automatic
 
                 return (TElement[] source) =>
                 {
+                    if (source == null) return sizeof(int);
                     return source.Length * elementSize + sizeof(int);
                 };
             }
@@ -94,6 +95,11 @@ namespace SmartPackager.Automatic
             {
                 return (byte* destination, TElement[] source) =>
                 {
+                    if (source == null)
+                    {
+                        *(int*)destination = -1;
+                        return sizeof(int);
+                    }
                     int length = source.Length;
 
                     *(int*)destination = length;    //Write Length to data
@@ -119,12 +125,15 @@ namespace SmartPackager.Automatic
                 return (byte* source, out TElement[] destination) =>
                 {
                     int length = *(int*)source;  //Read Length to data
+                    if (length < 0)
+                    {
+                        destination = null;
+                        return sizeof(int);
+                    }
                     source += sizeof(int);
 
                     long size = pack.GetSize(default) * length + sizeof(int);
-
                     destination = new TElement[length];
-
                     for (int i = 0; i < length; i++)
                     {
                         source += pack.UnPack(source, out destination[i]);
@@ -145,6 +154,11 @@ namespace SmartPackager.Automatic
             {
                 return (byte* destination, TElement[] source) =>
                 {
+                    if (source == null) 
+                    {
+                        *(int*)destination = -1;
+                        return sizeof(int);
+                    }
                     int length = source.Length;
 
                     *(int*)destination = length;    //Write Length to data
@@ -152,6 +166,8 @@ namespace SmartPackager.Automatic
 
                     long size = pack.GetSize(default) * length;
 
+                    //фикс - если массив нулевой длины 
+                    if(size>0)
                     fixed (void* ptr = &source[0])
                         Buffer.MemoryCopy(ptr, destination, size, size);
 
@@ -169,15 +185,19 @@ namespace SmartPackager.Automatic
                 return (byte* source, out TElement[] destination) =>
                 {
                     int length = *(int*)source;  //Read Length to data
+                    if (length < 0)
+                    {
+                        destination = null;
+                        return sizeof(int);
+                    }
                     source += sizeof(int);
 
                     long size = pack.GetSize(default) * length;
 
                     destination = new TElement[length];
-
-                    fixed (void* ptr = &destination[0])
-                        Buffer.MemoryCopy(source, ptr, size, size);
-
+                    if (size > 0) // фикс если массив 0 длины
+                        fixed (void* ptr = &destination[0])
+                            Buffer.MemoryCopy(source, ptr, size, size);
                     size += sizeof(int);
                     return size;
                 };
@@ -194,6 +214,8 @@ namespace SmartPackager.Automatic
             {
                 return (TElement[] source) =>
                 {
+                    if (source == null)
+                        return sizeof(int);
                     long size = sizeof(int);
 
                     int length = source.Length;
@@ -214,6 +236,11 @@ namespace SmartPackager.Automatic
             {
                 return (byte* destination, TElement[] source) =>
                 {
+                    if (source == null)
+                    {
+                        *(int*)destination = -1;
+                        return sizeof(int);
+                    }
                     int length = source.Length;
 
                     *(int*)destination = length;    //Write Length to data
@@ -242,6 +269,11 @@ namespace SmartPackager.Automatic
                 return (byte* source, out TElement[] destination) =>
                 {
                     int length = *(int*)source;  //Read Length to data
+                    if (length < 0)
+                    {
+                        destination = null;
+                        return sizeof(int);
+                    }
                     source += sizeof(int);
 
                     long size = sizeof(int);

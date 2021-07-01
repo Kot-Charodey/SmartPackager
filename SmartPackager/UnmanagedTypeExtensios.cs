@@ -10,7 +10,7 @@ namespace SmartPackager
     /// </summary>
     public static class UnmanagedTypeExtensios
     {
-        private static Dictionary<Type, bool> cachedTypes = new Dictionary<Type, bool>();
+        private static readonly Dictionary<Type, bool> cachedTypes = new Dictionary<Type, bool>();
 
         /// <summary>
         /// Checks if the type is managed
@@ -19,8 +19,7 @@ namespace SmartPackager
         /// <returns>returned true if type is unmanaged</returns>
         public static bool IsUnManaged(this Type t)
         {
-            bool result = false;
-            if (cachedTypes.TryGetValue(t, out result))
+            if (cachedTypes.TryGetValue(t, out bool result))
                 return result;
             else if (t.IsPrimitive || t.IsPointer || t.IsEnum)
                 result = true;

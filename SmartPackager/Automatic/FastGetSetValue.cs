@@ -10,6 +10,8 @@ namespace SmartPackager.Automatic
 {
     internal static class FastGetSetValue
     {
+        public delegate void Setter<TContainer, TField>(ref TContainer destination, TField getValue);
+
         //https://stackoverflow.com/questions/17660097/is-it-possible-to-speed-this-method-up/17669142
 
         public static Func<TContainer, TField> BuildUntypedGetter<TContainer, TField>(MemberInfo memberInfo)
@@ -25,19 +27,24 @@ namespace SmartPackager.Automatic
             return action;
         }
 
-        public static Action<TContainer, TField> BuildUntypedSetter<TContainer, TField>(MemberInfo memberInfo)
+        //можно ускорить с помошью
+        //s.GetType().GetField("Field").SetValueDirect(__makeref(s), 5);
+        //https://stackoverflow.com/questions/6280506/is-there-a-way-to-set-properties-on-struct-instances-using-reflection
+
+        public static Setter<TContainer, TField> BuildUntypedSetter<TContainer, TField>(MemberInfo memberInfo)
         {
             var targetType = memberInfo.DeclaringType;
-            var exInstance = Expression.Parameter(targetType, "t");
-
+            var exInstance = Expression.Parameter(targetType.MakeByRefType(), "t");
+            
             var exMemberAccess = Expression.MakeMemberAccess(exInstance, memberInfo);
+
 
             // t.PropertValue(Convert(p))
             var exValue = Expression.Parameter(typeof(TField), "p");
             //var exConvertedValue = Expression.Convert(exValue, GetUnderlyingType(memberInfo));
             var exBody = Expression.Assign(exMemberAccess, exValue);
-
-            var lambda = Expression.Lambda<Action<TContainer, TField>>(exBody, exInstance, exValue);
+            
+            var lambda = Expression.Lambda<Setter<TContainer, TField>>(exBody, exInstance, exValue);
             var action = lambda.Compile();
             return action;
         }
