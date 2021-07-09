@@ -115,6 +115,8 @@ namespace SmartPackager.Automatic
                     }
                 }
 
+                data.isFixedSize = isFixedSize;
+
                 //if structure
                 if (typeof(TContainer).IsValueType)
                 {
