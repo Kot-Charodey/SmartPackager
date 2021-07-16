@@ -11,23 +11,24 @@ namespace SmartPackager.Automatic
     internal static class FastGetSetValue
     {
         public delegate void Setter<TContainer, TField>(ref TContainer destination, TField getValue);
+        public delegate TField Getter<TContainer, TField>(TContainer destination);
 
         //https://stackoverflow.com/questions/17660097/is-it-possible-to-speed-this-method-up/17669142
 
-        public static Func<TContainer, TField> BuildUntypedGetter<TContainer, TField>(MemberInfo memberInfo)
+        public static Getter<TContainer, TField> BuildUntypedGetter<TContainer, TField>(MemberInfo memberInfo)
         {
             var targetType = memberInfo.DeclaringType;
             var exInstance = Expression.Parameter(targetType, "t");
 
             var exMemberAccess = Expression.MakeMemberAccess(exInstance, memberInfo);       // t.PropertyName
             //var exConvertToObject = Expression.Convert(exMemberAccess, typeof(TField));     // Convert(t.PropertyName, typeof(object))
-            var lambda = Expression.Lambda<Func<TContainer, TField>>(exMemberAccess, exInstance);
+            var lambda = Expression.Lambda<Getter<TContainer, TField>>(exMemberAccess, exInstance);
 
             var action = lambda.Compile();
             return action;
         }
 
-        //можно ускорить с помошью
+        //можно ускорить с помошью   (хз почему но работать стало медленнее в 10 раз)
         //s.GetType().GetField("Field").SetValueDirect(__makeref(s), 5);
         //https://stackoverflow.com/questions/6280506/is-there-a-way-to-set-properties-on-struct-instances-using-reflection
 
@@ -35,15 +36,14 @@ namespace SmartPackager.Automatic
         {
             var targetType = memberInfo.DeclaringType;
             var exInstance = Expression.Parameter(targetType.MakeByRefType(), "t");
-            
-            var exMemberAccess = Expression.MakeMemberAccess(exInstance, memberInfo);
 
+            var exMemberAccess = Expression.MakeMemberAccess(exInstance, memberInfo);
 
             // t.PropertValue(Convert(p))
             var exValue = Expression.Parameter(typeof(TField), "p");
             //var exConvertedValue = Expression.Convert(exValue, GetUnderlyingType(memberInfo));
             var exBody = Expression.Assign(exMemberAccess, exValue);
-            
+
             var lambda = Expression.Lambda<Setter<TContainer, TField>>(exBody, exInstance, exValue);
             var action = lambda.Compile();
             return action;
