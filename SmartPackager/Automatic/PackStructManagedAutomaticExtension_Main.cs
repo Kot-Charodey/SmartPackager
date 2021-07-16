@@ -32,18 +32,20 @@ namespace SmartPackager.Automatic
         /// <returns></returns>
         public static IPackagerMethodGeneric Make<T>()
         {
-            if (Cash.TryGetValue(typeof(T), out IPackagerMethodGeneric packager))
+            lock (Cash)
             {
-                return packager;
+                if (Cash.TryGetValue(typeof(T), out IPackagerMethodGeneric packager))
+                {
+                    return packager;
+                }
+
+                if (typeof(T).IsUnManaged() == true)
+                    throw new Exception("This type is unmanaged!");
+
+                IPackagerMethodGeneric pack = GetPackForType<T>();
+                Cash.Add(typeof(T), pack);
+                return pack;
             }
-
-            if (typeof(T).IsUnManaged() == true)
-                throw new Exception("This type is unmanaged!");
-
-            IPackagerMethodGeneric pack = GetPackForType<T>();
-
-            Cash.Add(typeof(T), pack);
-            return pack;
         }
 
         private static IPackagerMethodGeneric GetPackForType<T>()

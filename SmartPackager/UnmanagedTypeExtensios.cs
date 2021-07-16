@@ -10,7 +10,7 @@ namespace SmartPackager
     /// </summary>
     public static class UnmanagedTypeExtensios
     {
-        private static readonly Dictionary<Type, bool> cachedTypes = new Dictionary<Type, bool>();
+        private static readonly Dictionary<int, bool> cachedTypes = new Dictionary<int, bool>();
 
         /// <summary>
         /// Checks if the type is managed
@@ -19,7 +19,7 @@ namespace SmartPackager
         /// <returns>returned true if type is unmanaged</returns>
         public static bool IsUnManaged(this Type t)
         {
-            if (cachedTypes.TryGetValue(t, out bool result))
+            if (cachedTypes.TryGetValue(t.FullName.GetHashCode(), out bool result))
                 return result;
             else if (t.IsPrimitive || t.IsPointer || t.IsEnum)
                 result = true;
@@ -28,7 +28,7 @@ namespace SmartPackager
             else
                 result = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).
                     All(x => x.FieldType.IsUnManaged());
-            cachedTypes.Add(t, result);
+            cachedTypes.Add(t.FullName.GetHashCode(), result);
             return result;
         }
     }

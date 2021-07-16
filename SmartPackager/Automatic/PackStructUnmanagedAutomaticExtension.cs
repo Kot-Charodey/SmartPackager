@@ -11,7 +11,7 @@ namespace SmartPackager.Automatic
     {
         private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructUnmanagedAutomaticExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
         internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
-
+        
         /// <summary>
         /// Allows you to get a PackStructUnmanaged of the desired type 
         /// *[has caching of generated types]
@@ -19,20 +19,22 @@ namespace SmartPackager.Automatic
         /// <returns></returns>
         public static IPackagerMethodGeneric Make<T>()
         {
-            if (Cash.TryGetValue(typeof(T), out IPackagerMethodGeneric packager))
+            lock (Cash)
             {
-                return packager;
+                if (Cash.TryGetValue(typeof(T), out IPackagerMethodGeneric packager))
+                {
+                    return packager;
+                }
+
+                if (typeof(T).IsUnManaged() == false)
+                    throw new Exception("This type is not unmanaged!");
+
+                //exception bypass - this type must be unmanaged
+                MethodInfo mi = GetPackFromType_MethodInfo.MakeGenericMethod(typeof(T));
+                IPackagerMethodGeneric pack = (IPackagerMethodGeneric)mi.Invoke(null, null);
+                Cash.Add(typeof(T), pack);
+                return pack;
             }
-
-            if (typeof(T).IsUnManaged() == false)
-                throw new Exception("This type is not unmanaged!");
-
-            //exception bypass - this type must be unmanaged
-            MethodInfo mi = GetPackFromType_MethodInfo.MakeGenericMethod(typeof(T));
-            IPackagerMethodGeneric pack = (IPackagerMethodGeneric)mi.Invoke(null, null);
-
-            Cash.Add(typeof(T), pack);
-            return pack;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
