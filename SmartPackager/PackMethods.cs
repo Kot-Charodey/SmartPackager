@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace SmartPackager
 {
@@ -21,7 +22,28 @@ namespace SmartPackager
 
             //find IPackagerMethods
             Type targetFind = typeof(IPackagerMethodGeneric);
-            var IPackagerMethods = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => targetFind.IsAssignableFrom(p) && targetFind != p);
+            System.Reflection.Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<Type> IPackagerMethods = new List<Type>(1000);
+            for (int i = 0; i < Assemblies.Length; i++)
+            {
+                try
+                {
+                    Type[] types = Assemblies[i].GetTypes();
+                    for (int j = 0; j < types.Length; j++)
+                    {
+                        if (targetFind.IsAssignableFrom(types[j]) && targetFind != types[j])
+                        {
+                            IPackagerMethods.Add(types[j]);
+                        }
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("SmartPackager -> Fail load Assembly -> " + Assemblies[i].Location);
+                }
+
+            }
+            //var IPackagerMethods = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => targetFind.IsAssignableFrom(p) && targetFind != p);
 
             foreach (Type TypeIpm in IPackagerMethods)
             {
@@ -42,7 +64,6 @@ namespace SmartPackager
                     }
                 }
             }
-
             return sm;
         }
 
