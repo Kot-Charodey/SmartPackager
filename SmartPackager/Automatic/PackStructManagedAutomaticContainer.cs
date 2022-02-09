@@ -9,12 +9,11 @@ namespace SmartPackager.Automatic
         private const BindingFlags bindingFlagsDefault = BindingFlags.Public | BindingFlags.Instance;
         private const BindingFlags bindingFlagsAll = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-
         private enum ContainerStatus : byte
         {
-            error,
-            empty,
-            contains,
+            Error,
+            Null,
+            Data,
         }
 
         private static bool IsStatic(this PropertyInfo property)
@@ -78,9 +77,9 @@ namespace SmartPackager.Automatic
             private static MethodInfo PackExtension_MethodInfo => typeof(Container).GetMethod("PackExtension", BindingFlags.NonPublic | BindingFlags.Static);
             private static MethodInfo CreateClass_MethodInfo => typeof(Container).GetMethod("CreateClass", BindingFlags.NonPublic | BindingFlags.Static);
 
-            private unsafe delegate void PackUp<TContainer>(ref byte* dest, in TContainer target, ref long size);
-            private unsafe delegate void UnPack<TContainer>(ref byte* sour, ref TContainer target, ref long size);
-            private unsafe delegate void GetSize<TContainer>(TContainer target, ref long size);
+            private unsafe delegate void PackUp<TContainer>(ref byte* dest, in TContainer target, ref int size);
+            private unsafe delegate void UnPack<TContainer>(ref byte* sour, ref TContainer target, ref int size);
+            private unsafe delegate void GetSize<TContainer>(TContainer target, ref int size);
             private delegate T Delegate_CreateClass<T>();
             private delegate bool Delegate_PackExtension<TContainer>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo);
 
@@ -120,7 +119,7 @@ namespace SmartPackager.Automatic
                 {
                     data.action_PackUP = (byte* destination, TContainer source) =>
                     {
-                        long size = 0;
+                        int size = 0;
                         packUp.Invoke(ref destination, source, ref size);
 
                         return size;
@@ -128,7 +127,7 @@ namespace SmartPackager.Automatic
 
                     data.action_UnPack = (byte* source, out TContainer destination) =>
                     {
-                        long size = 0;
+                        int size = 0;
                         destination = default;
                         unPack.Invoke(ref source, ref destination, ref size);
 
@@ -137,7 +136,7 @@ namespace SmartPackager.Automatic
 
                     if (isFixedSize)
                     {
-                        long clcSize = 0;
+                        int clcSize = 0;
                         getSize.Invoke(default, ref clcSize);
 
                         data.action_GetSize = (TContainer source) =>
@@ -149,7 +148,7 @@ namespace SmartPackager.Automatic
                     {
                         data.action_GetSize = (TContainer source) =>
                         {
-                            long size = 0;
+                            int size = 0;
                             if (source != null)
                             {
                                 getSize.Invoke(source, ref size);
@@ -163,7 +162,7 @@ namespace SmartPackager.Automatic
                 {
                     data.action_PackUP = (byte* destination, TContainer source) =>
                     {
-                        long size = sizeof(byte);
+                        int size = sizeof(byte);
 
                         if (source == null)
                         {
@@ -184,14 +183,14 @@ namespace SmartPackager.Automatic
 
                     data.action_UnPack = (byte* source, out TContainer destination) =>
                     {
-                        long size = sizeof(byte);
+                        int size = sizeof(byte);
 
                         switch (*(ContainerStatus*)source)
                         {
-                            case ContainerStatus.empty:
+                            case ContainerStatus.Null:
                                 destination = default;//null
                                 break;
-                            case ContainerStatus.contains:
+                            case ContainerStatus.Data:
                                 source += 1;
                                 destination = createClass.Invoke();
                                 unPack.Invoke(ref source, ref destination, ref size);
@@ -205,7 +204,7 @@ namespace SmartPackager.Automatic
 
                     if (isFixedSize)
                     {
-                        long clcSize = sizeof(byte);
+                        int clcSize = sizeof(byte);
                         getSize.Invoke(createClass.Invoke(), ref clcSize);
 
                         data.action_GetSize = (TContainer source) =>
@@ -217,7 +216,7 @@ namespace SmartPackager.Automatic
                     {
                         data.action_GetSize = (TContainer source) =>
                         {
-                            long size = sizeof(byte);
+                            int size = sizeof(byte);
                             if (source != null)
                             {
                                 getSize.Invoke(source, ref size);
@@ -242,22 +241,22 @@ namespace SmartPackager.Automatic
                 var getter = FastGetSetValue.BuildUntypedGetter<TContainer,TField>(memberInfo);
                 var setter = FastGetSetValue.BuildUntypedSetter<TContainer,TField>(memberInfo);
 
-                packUP = (ref byte* destination, in TContainer target, ref long size) =>
+                packUP = (ref byte* destination, in TContainer target, ref int size) =>
                 {
-                    long s = ipm.PackUP(destination, getter(target));
+                    int s = ipm.PackUP(destination, getter(target));
                     size += s;
                     destination += s;
                 };
 
-                unPack = (ref byte* sourse, ref TContainer target, ref long size) =>
+                unPack = (ref byte* sourse, ref TContainer target, ref int size) =>
                 {
-                    long s = ipm.UnPack(sourse, out TField targ);
+                    int s = ipm.UnPack(sourse, out TField targ);
                     size += s;
                     sourse += s;
                     setter(ref target, targ);
                 };
 
-                getSize = (TContainer target, ref long size) =>
+                getSize = (TContainer target, ref int size) =>
                 {
                     size += ipm.GetSize(getter(target));
                 };

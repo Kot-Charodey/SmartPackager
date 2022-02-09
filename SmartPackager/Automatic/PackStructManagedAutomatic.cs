@@ -26,10 +26,10 @@ namespace SmartPackager.Automatic
             IsFixedSize = isFixedSize;
         }
 
-        public long GetSize(T source) => Action_GetSize.Invoke(source);
+        public int GetSize(T source) => Action_GetSize.Invoke(source);
 
-        public unsafe long PackUP(byte* destination, T source) => Action_PackUP.Invoke(destination, source);
+        public unsafe int PackUP(byte* destination, T source) => Action_PackUP.Invoke(destination, source);
 
-        public unsafe long UnPack(byte* source, out T destination) => Action_UnPack.Invoke(source, out destination);
+        public unsafe int UnPack(byte* source, out T destination) => Action_UnPack.Invoke(source, out destination);
     }
 }

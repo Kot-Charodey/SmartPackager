@@ -13,7 +13,7 @@ namespace SmartPackager.BasicPackMethods
 
         public bool IsFixedSize => false;
 
-        public unsafe long PackUP(byte* destination, string source)
+        public unsafe int PackUP(byte* destination, string source)
         {
             if (source == null)
             {
@@ -34,7 +34,7 @@ namespace SmartPackager.BasicPackMethods
             }
         }
 
-        public unsafe long UnPack(byte* source, out string destination)
+        public unsafe int UnPack(byte* source, out string destination)
         {
             if (*(int*)source == -1)
             {
@@ -58,7 +58,7 @@ namespace SmartPackager.BasicPackMethods
             }
         }
 
-        public long GetSize(string source)
+        public int GetSize(string source)
         {
             if (source == null)
                 return sizeof(int);

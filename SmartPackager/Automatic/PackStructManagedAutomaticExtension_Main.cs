@@ -8,9 +8,9 @@ namespace SmartPackager.Automatic
     {
         internal static readonly Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
-        internal unsafe delegate long Delegate_GetSize<T>(T source);
-        internal unsafe delegate long Delegate_PackUP<T>(byte* destination, T source);
-        internal unsafe delegate long Delegate_UnPack<T>(byte* source, out T destination);
+        internal unsafe delegate int Delegate_GetSize<T>(T source);
+        internal unsafe delegate int Delegate_PackUP<T>(byte* destination, T source);
+        internal unsafe delegate int Delegate_UnPack<T>(byte* source, out T destination);
 
         private delegate MethodsData<T> delegate_PackGenerator<T>();
 

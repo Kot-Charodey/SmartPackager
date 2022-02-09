@@ -13,19 +13,19 @@ namespace SmartPackager.Automatic
 
         }
 
-        public unsafe long PackUP(byte* destination, T source)
+        public unsafe int PackUP(byte* destination, T source)
         {
             *(T*)destination = source;
             return sizeof(T);
         }
 
-        public unsafe long UnPack(byte* source, out T destination)
+        public unsafe int UnPack(byte* source, out T destination)
         {
             destination = *(T*)source;
             return sizeof(T);
         }
 
-        public unsafe long GetSize(T source)
+        public unsafe int GetSize(T source)
         {
             return sizeof(T);
         }

@@ -14,18 +14,18 @@ namespace SmartPackager
         /// <param name="destination">pointer to the beginning of the recording</param>
         /// <param name="source">object to record</param>
         /// <returns>how many bytes were written</returns>
-        long PackUP(byte* destination, T source);
+        int PackUP(byte* destination, T source);
         /// <summary>
         /// Unpacks an object from an array of bytes
         /// </summary>
         /// <param name="source">pointer to the beginning of reading</param>
         /// <param name="destination">finished object</param>
         /// <returns>how many bytes were read</returns>
-        long UnPack(byte* source, out T destination);
+        int UnPack(byte* source, out T destination);
         /// <summary>
         /// </summary>
         /// <param name="source">target</param>
         /// <returns>Object size in bytes</returns>
-        long GetSize(T source);
+        int GetSize(T source);
     }
 }

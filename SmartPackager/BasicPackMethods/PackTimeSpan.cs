@@ -8,20 +8,20 @@ namespace SmartPackager.BasicPackMethods
 
         public bool IsFixedSize => true;
 
-        public unsafe long PackUP(byte* destination, TimeSpan source)
+        public unsafe int PackUP(byte* destination, TimeSpan source)
         {
             *(long*)destination = source.Ticks;
             return sizeof(long);
         }
 
-        public unsafe long UnPack(byte* source, out TimeSpan destination)
+        public unsafe int UnPack(byte* source, out TimeSpan destination)
         {
             TimeSpan pt = new TimeSpan(*(long*)source);
             destination = pt;
             return sizeof(long);
         }
 
-        public long GetSize(TimeSpan source)
+        public int GetSize(TimeSpan source)
         {
             return sizeof(long);
         }

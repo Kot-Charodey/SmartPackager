@@ -203,14 +203,14 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1)
+            public int CalcNeedSize(T1 t1)
             {
                 return Ipm1.GetSize(t1);
             }
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -234,7 +234,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -264,7 +264,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2)
+            public int CalcNeedSize(T1 t1, T2 t2)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2);
@@ -272,7 +272,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -298,7 +298,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -332,7 +332,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -341,7 +341,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -369,7 +369,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -407,7 +407,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -417,7 +417,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -447,7 +447,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -489,7 +489,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -500,7 +500,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -532,7 +532,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -578,7 +578,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -590,7 +590,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -624,7 +624,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -674,7 +674,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -687,7 +687,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -723,7 +723,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -777,7 +777,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -791,7 +791,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -829,7 +829,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -887,7 +887,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -902,7 +902,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -942,7 +942,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1004,7 +1004,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1020,7 +1020,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1062,7 +1062,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1128,7 +1128,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1145,7 +1145,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1189,7 +1189,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1259,7 +1259,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1277,7 +1277,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1323,7 +1323,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1397,7 +1397,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1416,7 +1416,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1464,7 +1464,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1542,7 +1542,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1562,7 +1562,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1612,7 +1612,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1694,7 +1694,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1715,7 +1715,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1767,7 +1767,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -1853,7 +1853,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -1875,7 +1875,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -1929,7 +1929,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -2019,7 +2019,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -2042,7 +2042,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -2098,7 +2098,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -2192,7 +2192,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -2216,7 +2216,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -2274,7 +2274,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -2372,7 +2372,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -2397,7 +2397,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -2458,7 +2458,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19)
             {
                 fixed (byte* dest = &source[offset])
                 {
@@ -2560,7 +2560,7 @@
             /// Сalculates the required array size for packing
             /// </summary>
             /// <returns></returns>
-            public long CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
+            public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
                 return Ipm1.GetSize(t1) +
                        Ipm2.GetSize(t2) +
@@ -2586,7 +2586,7 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, long offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
+            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
                 fixed (byte* dest = &destination[offset])
                 {
@@ -2649,7 +2649,7 @@
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, long offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19, out T20 t20)
+            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19, out T20 t20)
             {
                 fixed (byte* dest = &source[offset])
                 {

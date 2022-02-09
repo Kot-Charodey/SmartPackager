@@ -78,7 +78,7 @@ namespace SmartPackager.Automatic
             }
             private static unsafe Delegate_GetSize<TElement[]> UnsafeGetSizeFixed<TElement>(IPackagerMethod<TElement> pack)
             {
-                long elementSize = pack.GetSize(default);
+                int elementSize = pack.GetSize(default);
 
                 return (TElement[] source) =>
                 {
@@ -105,7 +105,7 @@ namespace SmartPackager.Automatic
                     *(int*)destination = length;    //Write Length to data
                     destination += sizeof(int);
 
-                    long size = pack.GetSize(default) * length + sizeof(int);
+                    int size = pack.GetSize(default) * length + sizeof(int);
 
                     for (int i = 0; i < length; i++)
                     {
@@ -132,7 +132,7 @@ namespace SmartPackager.Automatic
                     }
                     source += sizeof(int);
 
-                    long size = pack.GetSize(default) * length + sizeof(int);
+                    int size = pack.GetSize(default) * length + sizeof(int);
                     destination = new TElement[length];
                     for (int i = 0; i < length; i++)
                     {
@@ -164,7 +164,7 @@ namespace SmartPackager.Automatic
                     *(int*)destination = length;    //Write Length to data
                     destination += sizeof(int);
 
-                    long size = pack.GetSize(default) * length;
+                    int size = pack.GetSize(default) * length;
 
                     //фикс - если массив нулевой длины 
                     if(size>0)
@@ -192,7 +192,7 @@ namespace SmartPackager.Automatic
                     }
                     source += sizeof(int);
 
-                    long size = pack.GetSize(default) * length;
+                    int size = pack.GetSize(default) * length;
 
                     destination = new TElement[length];
                     if (size > 0) // фикс если массив 0 длины
@@ -216,7 +216,7 @@ namespace SmartPackager.Automatic
                 {
                     if (source == null)
                         return sizeof(int);
-                    long size = sizeof(int);
+                    int size = sizeof(int);
 
                     int length = source.Length;
                     for (int i = 0; i < length; i++)
@@ -246,8 +246,8 @@ namespace SmartPackager.Automatic
                     *(int*)destination = length;    //Write Length to data
                     destination += sizeof(int);
 
-                    long size = sizeof(int);
-                    long tmSize;
+                    int size = sizeof(int);
+                    int tmSize;
 
                     for (int i = 0; i < length; i++)
                     {
@@ -276,8 +276,8 @@ namespace SmartPackager.Automatic
                     }
                     source += sizeof(int);
 
-                    long size = sizeof(int);
-                    long tmSize;
+                    int size = sizeof(int);
+                    int tmSize;
 
                     destination = new TElement[length];
 
