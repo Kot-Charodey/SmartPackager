@@ -51,6 +51,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SmartPackagerCollectionsGeneric\SmartPackagerCollectionsGeneric.csproj">
+      <Project>{988079bc-cddf-4637-b374-583a622d3137}</Project>
+      <Name>SmartPackagerCollectionsGeneric</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SmartPackager\SmartPackager.csproj">
       <Project>{7bb03a3c-b5ed-474d-89b0-c457630c5cfe}</Project>
       <Name>SmartPackager</Name>

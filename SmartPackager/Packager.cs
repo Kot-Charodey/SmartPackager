@@ -5,12 +5,22 @@
     /// </summary>
     public static class Packager
     {
+        private static bool StartInit=false;
         internal static IPackagerMethod<T> GetMethods<T>()
         {
+            if (!StartInit)
+            {
+                StartInit = true;
+                PackMethods.SetupPackMethods();
+            }
             //searches for a method implementation for this type or tries to generate
             if (PackMethods.PackMethodsDictionary.TryGetValue(typeof(T), out IPackagerMethodGeneric ipm))
             {
                 return (IPackagerMethod<T>)ipm;
+            }
+            else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(typeof(T).GetFullName(), out var type))
+            {
+                return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(type);
             }
             else if (typeof(T).IsUnManaged())
             {
@@ -210,6 +220,13 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
+            public unsafe int PackUP(byte* destination, T1 t1)
+            {
+                return Ipm1.PackUP(destination, t1);
+            }
+            /// <summary>
+            /// Packs data into an array
+            /// </summary>
             public unsafe void PackUP(byte[] destination, int offset, T1 t1)
             {
                 fixed (byte* dest = &destination[offset])
@@ -230,6 +247,13 @@
                     Ipm1.PackUP(point, t1);
                 }
                 return destination;
+            }
+            /// <summary>
+             /// Unpacks data from an array
+             /// </summary>
+            public unsafe int UnPack(byte* source, out T1 t1)
+            {
+                return Ipm1.UnPack(source, out t1);
             }
             /// <summary>
             /// Unpacks data from an array
@@ -272,6 +296,20 @@
             /// <summary>
             /// Packs data into an array
             /// </summary>
+            public unsafe int PackUP(byte* destination, T1 t1, T2 t2)
+            {
+                int size = 0;
+                int offset;
+
+                offset = Ipm1.PackUP(destination, t1);
+                destination += offset;
+                size += offset;
+                size += Ipm2.PackUP(destination, t2);
+                return size;
+            }
+            /// <summary>
+            /// Packs data into an array
+            /// </summary>
             public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2)
             {
                 fixed (byte* dest = &destination[offset])
@@ -294,6 +332,18 @@
                     Ipm2.PackUP(point, t2);
                 }
                 return destination;
+            }
+            /// <summary>
+            /// Unpacks data from an array
+            /// </summary>
+            public unsafe int UnPack(byte* source, out T1 t1, out T2 t2)
+            {
+                int size = 0;
+                int offset;
+                offset = Ipm1.UnPack(source, out t1);
+                size += offset;
+                size += Ipm2.UnPack(source, out t2);
+                return size;
             }
             /// <summary>
             /// Unpacks data from an array

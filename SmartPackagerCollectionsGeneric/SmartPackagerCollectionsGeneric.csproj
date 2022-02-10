@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7BB03A3C-B5ED-474D-89B0-C457630C5CFE}</ProjectGuid>
+    <ProjectGuid>{988079BC-CDDF-4637-B374-583A622D3137}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SmartPackager</RootNamespace>
-    <AssemblyName>SmartPackager</AssemblyName>
+    <RootNamespace>SmartPackager.Collections.Generic</RootNamespace>
+    <AssemblyName>SmartPackagerCollectionsGeneric</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +22,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Debug\SmartPackager.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,7 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\SmartPackager.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -46,26 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Automatic\FastGetSetValue.cs" />
-    <Compile Include="Automatic\GenericFactoryExtension.cs" />
-    <Compile Include="Automatic\NotPackAttribute.cs" />
-    <Compile Include="Automatic\SearchPrivateFieldsAttribute.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticContainer.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticExtension_PackArray.cs" />
-    <Compile Include="BasicPackMethods\PackTimeSpan.cs" />
-    <Compile Include="BasicPackMethods\PackString.cs" />
-    <Compile Include="BasicPackMethods\PackDateTime.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomatic.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticExtension_Main.cs" />
-    <Compile Include="Automatic\PackStructUnmanagedAutomatic.cs" />
-    <Compile Include="IPackagerMethodGeneric.cs" />
-    <Compile Include="Packager.cs" />
-    <Compile Include="IPackagerMethod.cs" />
-    <Compile Include="PackMethods.cs" />
-    <Compile Include="Automatic\PackStructUnmanagedAutomaticExtension.cs" />
+    <Compile Include="Dll.cs" />
+    <Compile Include="PackDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnmanagedTypeExtensios.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\SmartPackager\SmartPackager.csproj">
+      <Project>{7bb03a3c-b5ed-474d-89b0-c457630c5cfe}</Project>
+      <Name>SmartPackager</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

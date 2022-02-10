@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace SmartPackager
 {
@@ -10,15 +9,22 @@ namespace SmartPackager
     /// </summary>
     public static class PackMethods
     {
-        internal static Dictionary<Type, IPackagerMethodGeneric> PackMethodsDictionary = SetupPackMethods();
+        internal static Dictionary<Type, IPackagerMethodGeneric> PackMethodsDictionary = new Dictionary<Type, IPackagerMethodGeneric>();
+        internal static Dictionary<string, Type> PackGenericNoCreatedMethodsDictionary = new Dictionary<string, Type>();
+
+        internal static string GetFullName(this Type type)
+        {
+            return type.Namespace + ":" + type.Name;
+        }
 
         /// <summary>
         /// loads data type packaging implementations
         /// </summary>
         /// <returns></returns>
-        private static Dictionary<Type, IPackagerMethodGeneric> SetupPackMethods()
+        internal static void SetupPackMethods()
         {
-            Dictionary<Type, IPackagerMethodGeneric> sm = new Dictionary<Type, IPackagerMethodGeneric>();
+            PackMethodsDictionary.Clear();
+            PackGenericNoCreatedMethodsDictionary.Clear();
 
             //find IPackagerMethods
             Type targetFind = typeof(IPackagerMethodGeneric);
@@ -56,15 +62,36 @@ namespace SmartPackager
 
                     try
                     {
-                        sm.Add(ipm.TargetType, ipm);
+                        PackMethodsDictionary.Add(ipm.TargetType, ipm);
                     }
                     catch
                     {
-                        throw new Exception($"a packaging implementation for this type already exists!\ninfo\nType: {ipm.TargetType.FullName}\nClass: {ipm.GetType().FullName}");
+                        throw new Exception($"A packaging implementation for this type already exists!\ninfo\nType: {ipm.TargetType.FullName}\nClass: {ipm.GetType().FullName}");
+                    }
+                }
+                else
+                {
+
+
+                    var iPackagerMethod = TypeIpm.GetInterface("IPackagerMethod`1");
+                    if (iPackagerMethod != null)
+                    {
+                        try
+                        {
+                            var genericType = iPackagerMethod.GenericTypeArguments[0];
+                            if (genericType.GenericTypeArguments.Length > 0)
+                            {
+                                string fullName = genericType.GetFullName();
+                                PackGenericNoCreatedMethodsDictionary.Add(fullName, TypeIpm);
+                            }
+                        }
+                        catch
+                        {
+                            throw new Exception($"A packaging implementation for this type already exists!\ninfo\nType: {TypeIpm.FullName}\nClass: {TypeIpm.FullName}");
+                        }
                     }
                 }
             }
-            return sm;
         }
 
         /// <summary>
@@ -72,7 +99,7 @@ namespace SmartPackager
         /// </summary>
         public static void SetupAgainPackMethods()
         {
-            PackMethodsDictionary = SetupPackMethods();
+            SetupPackMethods();
         }
 
         /// <summary>
