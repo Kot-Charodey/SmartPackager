@@ -342,6 +342,7 @@
                 int offset;
                 offset = Ipm1.UnPack(source, out t1);
                 size += offset;
+                source += offset;
                 size += Ipm2.UnPack(source, out t2);
                 return size;
             }

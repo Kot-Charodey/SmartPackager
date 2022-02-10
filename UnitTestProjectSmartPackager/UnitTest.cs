@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System;
 
 namespace UnitTestProjectSmartPackager
@@ -196,6 +197,31 @@ namespace UnitTestProjectSmartPackager
                 Assert.IsTrue(tcd.a == TestPackager(tcd).a);
                 Assert.IsTrue(tcd.b == TestPackager(tcd).b);
             }
+        }
+
+        [TestMethod]
+        public void TestDictionary()
+        {
+            SmartPackager.Collections.Generic.Dll.Plug();
+
+            var pack = SmartPackager.Packager.Create<Dictionary<string, int>>();
+            Assert.AreEqual(pack.CalcNeedSize(null), 1);
+            Assert.IsTrue(pack.CalcNeedSize(new Dictionary<string, int>()) > 1);
+
+            pack.UnPack(pack.PackUP(null), 0, out var testD0);
+            Assert.IsNull(testD0);
+
+            var testD = new Dictionary<string, int>
+            {
+                { "a", 1 },
+                { "b", 2 },
+                { "c", 3 }
+            };
+
+            pack.UnPack(pack.PackUP(testD), 0, out testD);
+            Assert.AreEqual(testD["a"], 1);
+            Assert.AreEqual(testD["b"], 2);
+            Assert.AreEqual(testD["c"], 3);
         }
     }
 }

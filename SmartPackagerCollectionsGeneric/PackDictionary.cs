@@ -18,24 +18,42 @@ namespace SmartPackager.Collections.Generic
 
         public int GetSize(Dictionary<Key, Value> source)
         {
-            return PackBase.CalcNeedSize(source.Keys.ToArray(), source.Values.ToArray());
+            if (source == null)
+                return 1;
+            return PackBase.CalcNeedSize(source.Keys.ToArray(), source.Values.ToArray()) + 1;
         }
 
         public unsafe int PackUP(byte* destination, Dictionary<Key, Value> source)
         {
-            return PackBase.PackUP(destination, source.Keys.ToArray(), source.Values.ToArray());
+            *destination = source == null ? (byte)0 : (byte)1;
+            if (*destination != 0)
+            {
+                destination++;
+                return PackBase.PackUP(destination, source.Keys.ToArray(), source.Values.ToArray());
+            }
+            else
+                return 0;
         }
 
         public unsafe int UnPack(byte* source, out Dictionary<Key, Value> destination)
         {
-            int size = PackBase.UnPack(source, out var key, out var value);
-
-            destination = new Dictionary<Key, Value>(key.Length);
-            for (int i = 0; i < key.Length; i++)
+            if (*source != 0)
             {
-                destination.Add(key[i], value[i]);
+                source++;
+                int size = PackBase.UnPack(source, out var key, out var value);
+
+                destination = new Dictionary<Key, Value>(key.Length);
+                for (int i = 0; i < key.Length; i++)
+                {
+                    destination.Add(key[i], value[i]);
+                }
+                return size;
             }
-            return size;
+            else
+            {
+                destination = null;
+                return 1;
+            }
         }
     }
 }

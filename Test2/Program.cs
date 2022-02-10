@@ -6,11 +6,6 @@ namespace Test
 {
     class Program
     {
-        struct TestClassData
-        {
-            public string g;
-        }
-
         static void Main()
         {
             SmartPackager.Collections.Generic.Dll.Plug();
