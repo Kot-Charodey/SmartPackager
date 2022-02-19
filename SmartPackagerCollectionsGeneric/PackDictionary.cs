@@ -41,8 +41,9 @@ namespace SmartPackager.Collections.Generic
             {
                 source++;
                 int size = PackBase.UnPack(source, out var key, out var value);
-
                 destination = new Dictionary<Key, Value>(key.Length);
+                byte[] kk = new byte[1024];
+
                 for (int i = 0; i < key.Length; i++)
                 {
                     destination.Add(key[i], value[i]);
