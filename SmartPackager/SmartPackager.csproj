@@ -59,6 +59,7 @@
     <Compile Include="Automatic\PackStructManagedAutomaticExtension_Main.cs" />
     <Compile Include="Automatic\PackStructUnmanagedAutomatic.cs" />
     <Compile Include="IPackagerMethodGeneric.cs" />
+    <Compile Include="ManagedHeap.cs" />
     <Compile Include="Packager.cs" />
     <Compile Include="IPackagerMethod.cs" />
     <Compile Include="PackMethods.cs" />

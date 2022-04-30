@@ -6,29 +6,35 @@
     public static class Packager
     {
         private static bool StartInit=false;
+        private readonly static object Syns = new object();
+
         internal static IPackagerMethod<T> GetMethods<T>()
         {
-            if (!StartInit)
+            lock (Syns) //немного потокобезопасности
             {
-                StartInit = true;
-                PackMethods.SetupPackMethods();
-            }
-            //searches for a method implementation for this type or tries to generate
-            if (PackMethods.PackMethodsDictionary.TryGetValue(typeof(T), out IPackagerMethodGeneric ipm))
-            {
-                return (IPackagerMethod<T>)ipm;
-            }
-            else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(typeof(T).GetFullName(), out var type))
-            {
-                return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(type);
-            }
-            else if (typeof(T).IsUnManaged())
-            {
-                return (IPackagerMethod<T>)Automatic.PackStructUnmanagedAutomaticExtension.Make<T>();
-            }
-            else
-            {
-                return (IPackagerMethod<T>)Automatic.PackStructManagedAutomaticExtension.Make<T>();
+                if (!StartInit)
+                {
+                    PackMethods.SetupPackMethods();
+                    StartInit = true;
+                }
+
+                //searches for a method implementation for this type or tries to generate
+                if (PackMethods.PackMethodsDictionary.TryGetValue(typeof(T), out IPackagerMethodGeneric ipm))
+                {
+                    return (IPackagerMethod<T>)ipm;
+                }
+                else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(typeof(T).GetFullName(), out var type))
+                {
+                    return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(type);
+                }
+                else if (typeof(T).IsUnManaged())
+                {
+                    return (IPackagerMethod<T>)Automatic.PackStructUnmanagedAutomaticExtension.Make<T>();
+                }
+                else
+                {
+                    return (IPackagerMethod<T>)Automatic.PackStructManagedAutomaticExtension.Make<T>();
+                }
             }
         }
 
