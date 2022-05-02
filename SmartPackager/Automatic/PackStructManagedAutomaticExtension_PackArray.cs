@@ -40,29 +40,29 @@ namespace SmartPackager.Automatic
         {
             MethodsData<TArray> md = new MethodsData<TArray>
             {
-                isFixedSize = false
+                IsFixedSize = false
             };
 
             if (pack.IsFixedSize)
             {
-                md.action_GetSize = Array.GetSizeFixed<TArray, TElement>(pack);
+                md.Action_GetSize = Array.GetSizeFixed<TArray, TElement>(pack);
 
                 if (typeof(TElement).IsUnManaged())
                 {
-                    md.action_PackUP = Array.PackUPFixedMemoryCopy<TArray, TElement>(pack);
-                    md.action_UnPack = Array.UnPackFixedMemoryCopy<TArray, TElement>(pack);
+                    md.Action_PackUP = Array.PackUPFixedMemoryCopy<TArray, TElement>(pack);
+                    md.Action_UnPack = Array.UnPackFixedMemoryCopy<TArray, TElement>(pack);
                 }
                 else
                 {
-                    md.action_PackUP = Array.PackUPFixed<TArray, TElement>(pack);
-                    md.action_UnPack = Array.UnPackFixed<TArray, TElement>(pack);
+                    md.Action_PackUP = Array.PackUPFixed<TArray, TElement>(pack);
+                    md.Action_UnPack = Array.UnPackFixed<TArray, TElement>(pack);
                 }
             }
             else
             {
-                md.action_GetSize = Array.GetSizeDynamic<TArray, TElement>(pack);
-                md.action_PackUP = Array.PackUPDynamic<TArray, TElement>(pack);
-                md.action_UnPack = Array.UnPackDynamic<TArray, TElement>(pack);
+                md.Action_GetSize = Array.GetSizeDynamic<TArray, TElement>(pack);
+                md.Action_PackUP = Array.PackUPDynamic<TArray, TElement>(pack);
+                md.Action_UnPack = Array.UnPackDynamic<TArray, TElement>(pack);
             }
 
             return md;

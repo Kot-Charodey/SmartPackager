@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace UnitTestProjectSmartPackager
 {
@@ -202,7 +202,7 @@ namespace UnitTestProjectSmartPackager
         [TestMethod]
         public void TestDictionary()
         {
-            SmartPackager.Collections.Generic.Dll.Plug();
+            SmartPackager.Collections.Generic.Dll.Plug(false);
 
             var pack = SmartPackager.Packager.Create<Dictionary<string, int>>();
             Assert.AreEqual(pack.CalcNeedSize(null), 1);
@@ -222,6 +222,56 @@ namespace UnitTestProjectSmartPackager
             Assert.AreEqual(testD["a"], 1);
             Assert.AreEqual(testD["b"], 2);
             Assert.AreEqual(testD["c"], 3);
+        }
+
+        class RecursivelyClass
+        {
+            public RecursivelyClass val;
+        }
+
+
+        [TestMethod]
+        public void TestRecursivelyClass()
+        {
+            RecursivelyClass test = new RecursivelyClass();
+            test.val = test;
+
+            var pack = SmartPackager.Packager.Create<RecursivelyClass>();
+            byte[] data = pack.PackUP(test);
+            pack.UnPack(data, 0, out var test2);
+            Assert.AreEqual(test2, test2.val);
+        }
+
+        class classA
+        {
+            public classB a;
+            public classB b;
+        }
+
+        class classB
+        {
+            public int a;
+            public classA cl;
+        }
+
+        [TestMethod]
+        public void TestClassRef()
+        {
+            classA test = new classA();
+            test.a = new classB()
+            {
+                a = 15,
+                cl = test
+            };
+            test.b = test.a;
+
+            var pack = SmartPackager.Packager.Create<classA>();
+            byte[] data = pack.PackUP(test);
+            pack.UnPack(data, 0, out var test2);
+            Assert.AreEqual(test2, test2.a.cl);
+            Assert.AreEqual(test2, test2.b.cl);
+            Assert.AreEqual(test2.a.cl, test2.b.cl);
+            Assert.AreEqual(test2.a.a, test2.b.a);
         }
     }
 }

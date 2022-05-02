@@ -8,31 +8,72 @@ namespace SmartPackager
 {
     internal unsafe class ManagedHeap
     {
-        public List<KeyValuePair<object, int>> HeapObjects;
-        public int HeapOffset = 0;
-        public byte* HeapStartPoint;
+        private readonly List<KeyValuePair<object, int>> HeapObjects = new List<KeyValuePair<object, int>>();
+        private readonly byte* HeapStart;
 
-
-        public byte* AllocateHeap(object ob,int size)
+        public ManagedHeap(byte* heapStart,object crObj)
         {
-            byte* ptr = HeapStartPoint + HeapOffset;
-            HeapObjects.Add(new KeyValuePair<object, int>(ob, HeapOffset));
-            HeapOffset += size;
-            return ptr;
+            HeapStart = heapStart;
+            HeapObjects.Add(new KeyValuePair<object, int>(crObj, 0));
         }
 
-        public bool TryGetHeap(object ob,out byte* pos)
+        public ManagedHeap(byte* heapStart)
         {
-            for(int i = 0; i < HeapObjects.Count; i++)
+            HeapStart = heapStart;
+        }
+
+
+        public ManagedHeap()
+        {
+            HeapStart = (byte*)-1;
+        }
+
+        public void AllocateHeap(object ob)
+        {
+            HeapObjects.Add(new KeyValuePair<object, int>(ob, -1));
+        }
+
+        public void AllocateHeap(object ob, byte* pos)
+        {
+            HeapObjects.Add(new KeyValuePair<object, int>(ob, (int)(pos - HeapStart)));
+        }
+
+        public void AllocateHeap(object ob, int pos)
+        {
+            HeapObjects.Add(new KeyValuePair<object, int>(ob, pos));
+        }
+
+        public bool TryGetHeap(object ob, out int pos)
+        {
+            for (int i = 0; i < HeapObjects.Count; i++)
             {
                 if (HeapObjects[i].Key == ob)
                 {
-                    pos = HeapStartPoint + HeapObjects[i].Value;
+                    pos = HeapObjects[i].Value;
                     return true;
                 }
             }
-            pos = (byte*)-1;
+            pos = -1;
             return false;
+        }
+
+        public bool TryGetHeap(int pos, out object ob)
+        {
+            for (int i = 0; i < HeapObjects.Count; i++)
+            {
+                if (HeapObjects[i].Value == pos)
+                {
+                    ob = HeapObjects[i].Key;
+                    return true;
+                }
+            }
+            ob = null;
+            return false;
+        }
+
+        public byte* CalcPoint(int pos)
+        {
+            return HeapStart + pos;
         }
     }
 }
