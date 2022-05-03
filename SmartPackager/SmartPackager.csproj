@@ -49,6 +49,7 @@
     <Compile Include="Automatic\FastGetSetValue.cs" />
     <Compile Include="Automatic\GenericFactoryExtension.cs" />
     <Compile Include="Automatic\NotPackAttribute.cs" />
+    <Compile Include="Automatic\PackStructManagedAutomaticHeapArray.cs" />
     <Compile Include="Automatic\PackStructManagedAutomaticHeap.cs" />
     <Compile Include="Automatic\RefObject.cs" />
     <Compile Include="Automatic\SearchPrivateFieldsAttribute.cs" />

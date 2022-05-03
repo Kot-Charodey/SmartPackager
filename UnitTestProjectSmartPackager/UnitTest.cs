@@ -177,6 +177,35 @@ namespace UnitTestProjectSmartPackager
             }
         }
 
+        public class ArrayClassTest
+        {
+            public int a;
+            public ArrayClassTest myRef;
+        }
+
+        [TestMethod]
+        public void TestPackager_ArrayClass()
+        {
+            ArrayClassTest[] Arr = new ArrayClassTest[1024];
+            ArrayClassTest k = new ArrayClassTest()
+            {
+                a = R.Next(),
+                myRef = null,
+            };
+            for (int i = 0; i < Arr.Length; i++)
+                Arr[i] = new ArrayClassTest() { a = R.Next(), myRef = k};
+
+            var ArrT = TestPackager(Arr);
+
+            Assert.AreEqual(ArrT.Length, Arr.Length);
+            for(int i = 0; i < Arr.Length; i++)
+            {
+                Assert.AreEqual(Arr[i].a, ArrT[i].a);
+                Assert.IsTrue(ArrT[0].myRef == ArrT[i].myRef);
+                Assert.AreEqual(ArrT[0].myRef.a, ArrT[i].myRef.a);
+            }
+        }
+
         [TestMethod]
         public void TestPackager_Class()
         {

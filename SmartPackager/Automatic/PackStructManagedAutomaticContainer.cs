@@ -17,14 +17,6 @@ namespace SmartPackager.Automatic
             Data,
         }
 
-        private enum PointerType : byte
-        {
-            Error,
-            Null,
-            Data,
-            Pointer,
-        }
-
         private static bool IsStatic(this PropertyInfo property)
         {
             var g1 = property.GetGetMethod(false);
