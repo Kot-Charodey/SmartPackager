@@ -13,7 +13,7 @@ namespace UnitTestProjectSmartPackager
     [TestClass]
     public class UnitTest
     {
-        Random R = new Random();
+        readonly Random R = new Random();
 
         private T TestPackager<T>(T data)
         {
@@ -220,9 +220,11 @@ namespace UnitTestProjectSmartPackager
                 Assert.IsTrue(tcd.b == TestPackager(tcd).b);
             }
             {
-                TestClassData tcd = new TestClassData();
-                tcd.a = R.Next();
-                tcd.b = R.Next();
+                TestClassData tcd = new TestClassData
+                {
+                    a = R.Next(),
+                    b = R.Next()
+                };
                 Assert.IsTrue(tcd.a == TestPackager(tcd).a);
                 Assert.IsTrue(tcd.b == TestPackager(tcd).b);
             }
@@ -271,30 +273,30 @@ namespace UnitTestProjectSmartPackager
             Assert.AreEqual(test2, test2.val);
         }
 
-        class classA
+        class ClassA
         {
-            public classB a;
-            public classB b;
+            public ClassB a;
+            public ClassB b;
         }
 
-        class classB
+        class ClassB
         {
             public int a;
-            public classA cl;
+            public ClassA cl;
         }
 
         [TestMethod]
         public void TestClassRef()
         {
-            classA test = new classA();
-            test.a = new classB()
+            ClassA test = new ClassA();
+            test.a = new ClassB()
             {
                 a = 15,
                 cl = test
             };
             test.b = test.a;
 
-            var pack = SmartPackager.Packager.Create<classA>();
+            var pack = SmartPackager.Packager.Create<ClassA>();
             byte[] data = pack.PackUP(test);
             pack.UnPack(data, 0, out var test2);
             Assert.AreEqual(test2, test2.a.cl);
@@ -303,7 +305,7 @@ namespace UnitTestProjectSmartPackager
             Assert.AreEqual(test2.a.a, test2.b.a);
         }
 
-        class classC
+        class ClassC
         {
             public int a;
             public int b;
@@ -312,16 +314,30 @@ namespace UnitTestProjectSmartPackager
         [TestMethod]
         public void TestFixedClass()
         {
-            classC classC = new classC();
-            classC.a = 11;
-            classC.b = 22;
+            ClassC classC = new ClassC
+            {
+                a = 11,
+                b = 22
+            };
 
             var t = TestPackager(classC);
             Assert.AreEqual(t.a, classC.a);
             Assert.AreEqual(t.b, classC.b);
-            Assert.AreEqual(SmartPackager.Packager.Create<classC>().CalcNeedSize(null), 1);
-            Assert.AreEqual(SmartPackager.Packager.Create<classC>().CalcNeedSize(new classC()), sizeof(byte) + sizeof(int) + sizeof(int));
-            Assert.IsTrue(SmartPackager.Packager.IsFixedType<classC>());
+            Assert.AreEqual(SmartPackager.Packager.Create<ClassC>().CalcNeedSize(null), 1);
+            Assert.AreEqual(SmartPackager.Packager.Create<ClassC>().CalcNeedSize(new ClassC()), sizeof(byte) + sizeof(int) + sizeof(int));
+            Assert.IsTrue(SmartPackager.Packager.IsFixedType<ClassC>());
+        }
+
+        [TestMethod]
+        public void TestRankArray()
+        {
+            int[] a = { 1, 2, 3, 4 };
+            int[,] b = { { 1, 2, 3 }, { 4, 5, 6 } };
+            int[,,] c = { { { 1, 2 }, { 3, 4 } }, { { 5, 6 }, { 7, 8 } } };
+
+            CollectionAssert.AreEqual(TestPackager(a), a);
+            CollectionAssert.AreEqual(TestPackager(b), b);
+            CollectionAssert.AreEqual(TestPackager(c), c);
         }
     }
 }      

@@ -64,7 +64,7 @@ namespace SmartPackager.Automatic
         /// contains packers that have not yet been created to the end
         /// enables recursive creation of the packager
         /// </summary>
-        private static Dictionary<Type,object> CreatingPackagerCash = new Dictionary<Type,object>();
+        private static readonly Dictionary<Type,object> CreatingPackagerCash = new Dictionary<Type,object>();
 
         private static IPackagerMethodGeneric GetPackForType<T>()
         {
