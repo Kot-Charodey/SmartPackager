@@ -49,7 +49,6 @@
     <Compile Include="Automatic\FastGetSetValue.cs" />
     <Compile Include="Automatic\GenericFactoryExtension.cs" />
     <Compile Include="Automatic\NotPackAttribute.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticHeapArray.cs" />
     <Compile Include="Automatic\PackStructManagedAutomaticHeap.cs" />
     <Compile Include="Automatic\RefObject.cs" />
     <Compile Include="Automatic\SearchPrivateFieldsAttribute.cs" />
@@ -58,7 +57,6 @@
     <Compile Include="BasicPackMethods\PackTimeSpan.cs" />
     <Compile Include="BasicPackMethods\PackString.cs" />
     <Compile Include="BasicPackMethods\PackDateTime.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomatic.cs" />
     <Compile Include="Automatic\PackStructManagedAutomaticExtension_Main.cs" />
     <Compile Include="Automatic\PackStructUnmanagedAutomatic.cs" />
     <Compile Include="IPackagerMethodGeneric.cs" />

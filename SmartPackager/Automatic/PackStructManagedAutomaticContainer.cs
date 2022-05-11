@@ -10,13 +10,6 @@ namespace SmartPackager.Automatic
         private const BindingFlags bindingFlagsDefault = BindingFlags.Public | BindingFlags.Instance;
         private const BindingFlags bindingFlagsAll = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-        private enum ContainerStatus : byte
-        {
-            Error,
-            Null,
-            Data,
-        }
-
         private static bool IsStatic(this PropertyInfo property)
         {
             var g1 = property.GetGetMethod(false);
@@ -81,7 +74,7 @@ namespace SmartPackager.Automatic
             private unsafe delegate void UnPack<TContainer>(ref byte* sour, ManagedHeap heap, ref TContainer target, ref int size);
             private unsafe delegate void GetSize<TContainer>(TContainer target, ManagedHeap heap, ref int size);
             private delegate T Delegate_CreateClass<T>();
-            private delegate void Delegate_PackExtension<TContainer>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo);
+            private delegate bool Delegate_PackExtension<TContainer>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo);
 
 
             public unsafe static void Pack<TContainer>(MemberInfo[] membersInfo, ref MethodsDataHeap<TContainer> data)
@@ -89,6 +82,8 @@ namespace SmartPackager.Automatic
                 PackUp<TContainer> packUp = null;
                 UnPack<TContainer> unPack = null;
                 GetSize<TContainer> getSize = null;
+
+                data.IsFixedSize = true;
 
                 for (int i = 0; i < membersInfo.Length; i++)
                 {
@@ -99,7 +94,7 @@ namespace SmartPackager.Automatic
                     MethodInfo mi = PackExtension_MethodInfo.MakeGenericMethod(typeTContainer, typeTField);
 
 
-                    ((Delegate_PackExtension<TContainer>)mi.CreateDelegate(typeof(Delegate_PackExtension<TContainer>))).
+                    data.IsFixedSize &= ((Delegate_PackExtension<TContainer>)mi.CreateDelegate(typeof(Delegate_PackExtension<TContainer>))).
                         Invoke(out PackUp<TContainer> up, out UnPack<TContainer> down, out GetSize<TContainer> gs, memberInfo);
 
                     if (i == 0)
@@ -119,8 +114,6 @@ namespace SmartPackager.Automatic
                 //if structure
                 if (typeof(TContainer).IsValueType)
                 {
-                    //мб реализовать   [isFixedSize]
-
                     data.Action_PackUP = (byte* destination, ManagedHeap heap, TContainer source) =>
                     {
                         int size = 0;
@@ -138,33 +131,33 @@ namespace SmartPackager.Automatic
                         return size;
                     };
 
-                    data.Action_GetSize = (TContainer source, ManagedHeap heap) =>
+                    if (data.IsFixedSize)
                     {
-                        int size = 0;
-                        if (source != null)
+                        int cashSize = 0;
+                        getSize.Invoke(default, new ManagedHeap(), ref cashSize);
+                        data.Action_GetSize = (TContainer source, ManagedHeap heap) =>
                         {
+                            return cashSize;
+                        };
+                    }
+                    else
+                    {
+                        data.Action_GetSize = (TContainer source, ManagedHeap heap) =>
+                        {
+                            int size = 0;
                             getSize.Invoke(source, heap, ref size);
-                        }
 
-                        return size;
-                    };
+                            return size;
+                        };
+                    }
                 }
                 else //if class
                 {
                     data.Action_PackUP = (byte* destination, ManagedHeap heap, TContainer source) =>
                     {
-                        int size = sizeof(byte);
-
-                        if (source == null)
-                        {
-                            *destination = 1;
-                        }
-                        else
-                        {
-                            *destination = 2;
-                            destination += 1;
-                            packUp.Invoke(ref destination, heap, source, ref size);
-                        }
+                        int size = 0;
+                        heap.AllocateHeap(source, destination - sizeof(byte));
+                        packUp.Invoke(ref destination, heap, source, ref size);
 
                         return size;
                     };
@@ -174,46 +167,46 @@ namespace SmartPackager.Automatic
 
                     data.Action_UnPack = (byte* source, ManagedHeap heap, out TContainer destination) =>
                     {
-                        int size = sizeof(byte);
+                        int size = 0;
 
-                        switch (*(ContainerStatus*)source)
-                        {
-                            case ContainerStatus.Null:
-                                destination = default;//null
-                                break;
-                            case ContainerStatus.Data:
-                                destination = createClass.Invoke();
-                                heap.AllocateHeap(destination, source);
-                                source ++;
-                                unPack.Invoke(ref source, heap, ref destination, ref size);
-                                break;
-                            default:
-                                throw new Exception("Invalid expression for unpacking");
-                        }
+                        destination = createClass.Invoke();
+                        heap.AllocateHeap(destination, source - sizeof(byte));
+                        unPack.Invoke(ref source, heap, ref destination, ref size);
 
                         return size;
                     };
-                    data.Action_GetSize = (TContainer source, ManagedHeap heap) =>
+
+                    if (data.IsFixedSize)
                     {
-                        int size = sizeof(byte);
-                        if (source != null)
+                        int cashSize = 0;
+                        TContainer container = createClass.Invoke();
+                        getSize.Invoke(container, new ManagedHeap(container), ref cashSize);
+                        data.Action_GetSize = (TContainer source, ManagedHeap heap) =>
                         {
+                            return cashSize;
+                        };
+                    }
+                    else
+                    {
+                        data.Action_GetSize = (TContainer source, ManagedHeap heap) =>
+                        {
+                            int size = 0;
+                            heap.AllocateHeap(source);
                             getSize.Invoke(source, heap, ref size);
-                        }
-
-                        return size;
-                    };
+                            return size;
+                        };
+                    }
                 }
             }
 
-            //[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
             private static T CreateClass<T>() where T : new()
             {
                 return new T();
             }
 
-            //[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
-            private unsafe static void PackExtension<TContainer, TField>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo)
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
+            private unsafe static bool PackExtension<TContainer, TField>(out PackUp<TContainer> packUP, out UnPack<TContainer> unPack, out GetSize<TContainer> getSize, MemberInfo memberInfo)
             {
                 var getter = FastGetSetValue.BuildUntypedGetter<TContainer, TField>(memberInfo);
                 var setter = FastGetSetValue.BuildUntypedSetter<TContainer, TField>(memberInfo);
@@ -241,81 +234,25 @@ namespace SmartPackager.Automatic
 
                     packUP = (ref byte* destination, ManagedHeap heap, in TContainer target, ref int size) =>
                     {
-                        var val = getter(target);
-                        if (val == null)
-                        {
-                            *destination = (byte)PointerType.Null;
-                            destination++;
-                            size += 1;
-                        }
-                        else if (heap.TryGetHeap(val, out var pos))
-                        {
-                            *destination = (byte)PointerType.Pointer;
-                            destination++;
-                            *(int*)destination = pos;
-                            destination += sizeof(int);
-                            size += 1 + sizeof(int);
-                        }
-                        else
-                        {
-                            *destination = (byte)PointerType.Data;
-                            destination++;
-                            int s = ipm_heapRef.Object.PackUP(destination, heap, val);
-                            size += s + 1;
-                            destination += s;
-                        }
+                        int s = ipm_heapRef.Object.PackUP(destination, heap, getter(target));
+                        size += s;
+                        destination += s;
                     };
 
                     unPack = (ref byte* sourse, ManagedHeap heap, ref TContainer target, ref int size) =>
                     {
-                        PointerType type = (PointerType)(*sourse);
-                        sourse++;
-                        size++;
-
-                        switch (type)
-                        {
-                            case PointerType.Null:
-                                break;
-                            case PointerType.Pointer:
-                                int pos = *(int*)sourse;
-                                sourse += sizeof(int);
-                                size += sizeof(int);
-                                if (heap.TryGetHeap(pos, out var ob))
-                                    setter(ref target, (TField)ob);
-                                else
-                                    throw new Exception("Invalid expression for unpacking");
-                                break;
-                            case PointerType.Data:
-                                {
-                                    int s = ipm_heapRef.Object.UnPack(sourse, heap, out TField targ);
-                                    heap.AllocateHeap(targ, sourse);
-                                    size += s;
-                                    sourse += s;
-                                    setter(ref target, targ);
-                                }
-                                break;
-                            default:
-                                throw new Exception("Invalid expression for unpacking");
-                        }
+                        int s = ipm_heapRef.Object.UnPack(sourse, heap, out TField targ);
+                        size += s;
+                        sourse += s;
+                        setter(ref target, targ);
                     };
 
                     getSize = (TContainer target, ManagedHeap heap, ref int size) =>
                     {
-                        var val = getter(target);
-                        if (val == null)
-                        {
-                            size += 1;
-                        }
-                        else if (heap.TryGetHeap(val, out _))
-                        {
-                            size += 1 + sizeof(int);
-                        }
-                        else
-                        {
-                            heap.AllocateHeap(val);
-                            size += 1 + ipm_heapRef.Object.GetSize(val, heap);
-                        }
+                        size += ipm_heapRef.Object.GetSize(getter(target), heap);
                     };
+
+                    return false;
                 }
                 else
                 {
@@ -338,6 +275,7 @@ namespace SmartPackager.Automatic
                     {
                         size += ipm.GetSize(getter(target));
                     };
+                    return true;
                 }
             }
         }

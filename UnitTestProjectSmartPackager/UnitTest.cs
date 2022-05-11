@@ -193,12 +193,12 @@ namespace UnitTestProjectSmartPackager
                 myRef = null,
             };
             for (int i = 0; i < Arr.Length; i++)
-                Arr[i] = new ArrayClassTest() { a = R.Next(), myRef = k};
+                Arr[i] = new ArrayClassTest() { a = R.Next(), myRef = k };
 
             var ArrT = TestPackager(Arr);
 
             Assert.AreEqual(ArrT.Length, Arr.Length);
-            for(int i = 0; i < Arr.Length; i++)
+            for (int i = 0; i < Arr.Length; i++)
             {
                 Assert.AreEqual(Arr[i].a, ArrT[i].a);
                 Assert.IsTrue(ArrT[0].myRef == ArrT[i].myRef);
@@ -302,5 +302,26 @@ namespace UnitTestProjectSmartPackager
             Assert.AreEqual(test2.a.cl, test2.b.cl);
             Assert.AreEqual(test2.a.a, test2.b.a);
         }
+
+        class classC
+        {
+            public int a;
+            public int b;
+        }
+
+        [TestMethod]
+        public void TestFixedClass()
+        {
+            classC classC = new classC();
+            classC.a = 11;
+            classC.b = 22;
+
+            var t = TestPackager(classC);
+            Assert.AreEqual(t.a, classC.a);
+            Assert.AreEqual(t.b, classC.b);
+            Assert.AreEqual(SmartPackager.Packager.Create<classC>().CalcNeedSize(null), 1);
+            Assert.AreEqual(SmartPackager.Packager.Create<classC>().CalcNeedSize(new classC()), sizeof(byte) + sizeof(int) + sizeof(int));
+            Assert.IsTrue(SmartPackager.Packager.IsFixedType<classC>());
+        }
     }
-}
+}      

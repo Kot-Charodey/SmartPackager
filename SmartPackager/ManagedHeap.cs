@@ -11,9 +11,9 @@ namespace SmartPackager
         private readonly List<KeyValuePair<object, int>> HeapObjects = new List<KeyValuePair<object, int>>();
         private readonly byte* HeapStart;
 
-        public ManagedHeap(byte* heapStart,object crObj)
+        public ManagedHeap(object crObj)
         {
-            HeapStart = heapStart;
+            HeapStart = (byte*)-1;
             HeapObjects.Add(new KeyValuePair<object, int>(crObj, 0));
         }
 
@@ -30,17 +30,20 @@ namespace SmartPackager
 
         public void AllocateHeap(object ob)
         {
-            HeapObjects.Add(new KeyValuePair<object, int>(ob, -1));
+            if (ob != null)
+                HeapObjects.Add(new KeyValuePair<object, int>(ob, -1));
         }
 
         public void AllocateHeap(object ob, byte* pos)
         {
-            HeapObjects.Add(new KeyValuePair<object, int>(ob, (int)(pos - HeapStart)));
+            if(ob != null)
+                HeapObjects.Add(new KeyValuePair<object, int>(ob, (int)(pos - HeapStart)));
         }
 
         public void AllocateHeap(object ob, int pos)
         {
-            HeapObjects.Add(new KeyValuePair<object, int>(ob, pos));
+            if (ob != null)
+                HeapObjects.Add(new KeyValuePair<object, int>(ob, pos));
         }
 
         public bool TryGetHeap(object ob, out int pos)

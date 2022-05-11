@@ -38,6 +38,18 @@
             }
         }
 
+        #region Utilites
+        /// <summary>
+        /// Does this type have a static size
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool IsFixedType<T>()
+        {
+            return GetMethods<T>().IsFixedSize;
+        }
+        #endregion
+
         #region Create
         /// <summary>
         /// Creates a packer for the selected set of types

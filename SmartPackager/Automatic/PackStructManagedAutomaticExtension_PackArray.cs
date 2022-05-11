@@ -23,7 +23,7 @@ namespace SmartPackager.Automatic
         private static MethodInfo UnsafeUnPackDynamicHeap_MethodInfo => typeof(Array).GetMethod("UnsafeUnPackDynamicHeap", BindingFlags.NonPublic | BindingFlags.Static);
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
         private static MethodsDataHeap<TArray> PackArray<TArray, TElement>()
         {
             MethodsDataHeap<TArray> md;
