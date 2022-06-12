@@ -26,7 +26,7 @@ namespace UnitTestProjectSmartPackager
         [TestMethod]
         public void TestPackager_Numeric()
         {
-            Assert.AreEqual(byte.MinValue,
+            Assert.AreEqual(byte.MinValue+1,
                TestPackager(byte.MinValue));
             Assert.AreEqual(byte.MaxValue,
                TestPackager(byte.MaxValue));

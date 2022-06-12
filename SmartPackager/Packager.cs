@@ -5,17 +5,17 @@
     /// </summary>
     public static class Packager
     {
-        private static bool StartInit=false;
-        private readonly static object Syns = new object();
+        internal static bool SetupDone=false;
+        private readonly static object Sync = new object();
 
         internal static IPackagerMethod<T> GetMethods<T>()
         {
-            lock (Syns) //немного потокобезопасности
+            lock (Sync) //немного потокобезопасности
             {
-                if (!StartInit)
+                if (!SetupDone)
                 {
                     PackMethods.SetupPackMethods();
-                    StartInit = true;
+                    SetupDone = true;
                 }
 
                 //searches for a method implementation for this type or tries to generate

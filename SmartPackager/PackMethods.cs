@@ -100,6 +100,7 @@ namespace SmartPackager
         public static void SetupAgainPackMethods()
         {
             SetupPackMethods();
+            Packager.SetupDone = true;
         }
 
         /// <summary>
