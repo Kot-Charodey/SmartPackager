@@ -51,9 +51,11 @@
         /// <summary>
         /// Добавить в расчёт ссылку
         /// </summary>
-        public void AddReference()
+        public ByteRef MakeReference()
         {
+            ByteRef @ref= new ByteRef(Length);
             Length += sizeof(int);
+            return @ref;
         }
     }
 }

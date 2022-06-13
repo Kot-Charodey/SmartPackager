@@ -60,6 +60,7 @@
             return byteRef;
         }
 
+        /*
         /// <summary>
         /// Осуществляет переход по ссылке
         /// </summary>
@@ -69,5 +70,6 @@
         {
             return new ByteReader(this, byteRef.GetPoint());
         }
+        */
     }
 }

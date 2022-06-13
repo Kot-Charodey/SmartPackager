@@ -11,10 +11,15 @@ namespace SmartPackager.BitStream
     public struct ByteRef
     {
         private readonly int Point;
+        /// <summary>
+        /// Объект который находится по данной ссылке
+        /// </summary>
+        public object Content;
 
         internal ByteRef(int point)
         {
             Point = point;
+            Content = null;
         }
 
         internal int GetPoint()

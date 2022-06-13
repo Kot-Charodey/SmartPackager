@@ -47,7 +47,7 @@ namespace SmartPackager.BitStream
         /// Создаёт ссылку на текущию позицию
         /// </summary>
         /// <returns>ссылка</returns>
-        public ByteRef GetReference()
+        public ByteRef MakeReference()
         {
             return new ByteRef(Pos);
         }

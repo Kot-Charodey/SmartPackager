@@ -59,8 +59,9 @@ namespace UnitTest
             ByteMeter Meter = new();
             Meter.Add<int>();
             Assert.AreEqual(Meter.GetCalcLength(), 4);
-            Meter.AddReference();
+            var @ref = Meter.MakeReference();
             Assert.AreEqual(Meter.GetCalcLength(), 8);
+            Assert.AreEqual(@ref.GetPoint(), 4);
             Meter.Add<long>();
             Assert.AreEqual(Meter.GetCalcLength(), 16);
         }
