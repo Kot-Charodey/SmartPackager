@@ -59,6 +59,11 @@
     <Compile Include="BasicPackMethods\PackDateTime.cs" />
     <Compile Include="Automatic\PackStructManagedAutomaticExtension_Main.cs" />
     <Compile Include="Automatic\PackStructUnmanagedAutomatic.cs" />
+    <Compile Include="BitStream\ByteMeter.cs" />
+    <Compile Include="BitStream\ByteReader.cs" />
+    <Compile Include="BitStream\ByteRef.cs" />
+    <Compile Include="BitStream\ByteWriter.cs" />
+    <Compile Include="BitStream\UnsafeArray.cs" />
     <Compile Include="IPackagerMethodGeneric.cs" />
     <Compile Include="ManagedHeap.cs" />
     <Compile Include="Packager.cs" />
