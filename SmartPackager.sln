@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPackager", "SmartPacka
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeedTest", "SpeedTest\SpeedTest.csproj", "{34E1C626-86B3-4DB4-BCC3-53C2FFE7A38B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProjectSmartPackager", "UnitTestProjectSmartPackager\UnitTestProjectSmartPackager.csproj", "{EE481A86-25C1-47E6-BAB9-95EB06442553}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTestSmartPackager", "UnitTestProjectSmartPackager\UTestSmartPackager.csproj", "{EE481A86-25C1-47E6-BAB9-95EB06442553}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test2", "Test2\Test2.csproj", "{C5D70D05-0CC0-4453-8317-08DAFF8662B1}"
 EndProject

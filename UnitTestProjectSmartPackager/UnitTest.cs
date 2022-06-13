@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace UnitTestProjectSmartPackager
+namespace UTestSmartPackager
 {
     class TestClassData
     {
