@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 #if DEBUG
 [assembly: InternalsVisibleTo("UnitTest")]
 #endif
-namespace SmartPackager.BitStream
+namespace SmartPackager.ByteStack
 {
     
     /// <see cref="UnsafeArray"/>

@@ -1,4 +1,4 @@
-﻿namespace SmartPackager.BitStream
+﻿namespace SmartPackager.ByteStack
 {
     /// <summary>
     /// Расчитывает размер данных, которые необходимо упаковать
@@ -6,6 +6,7 @@
     public struct ByteMeter
     {
         private int Length;
+        private readonly RefArray RefArray;
 
         /// <summary>
         /// Получить расчитанный размер
@@ -49,13 +50,28 @@
         }
 
         /// <summary>
-        /// Добавить в расчёт ссылку
+        /// Создаёт ссылку на объект
         /// </summary>
-        public ByteRef MakeReference()
+        /// <returns>вернёт true если данный объект упаковывается в первые и не null (иначе упаковывать не надо)</returns>
+        public bool MakeReference(object val)
         {
-            ByteRef @ref= new ByteRef(Length);
             Length += sizeof(int);
-            return @ref;
+            if (val == null)
+            {
+                return false;
+            }
+            else
+            {
+                if (RefArray.Exists(val, out var point))
+                {
+                    return false;
+                }
+                else
+                {
+                    RefArray.AddRef(new RefPoint(Length, val));
+                    return true;
+                }
+            }
         }
     }
 }

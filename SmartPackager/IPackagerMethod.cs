@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace SmartPackager
+﻿namespace SmartPackager
 {
+    using ByteStack;
     /// <summary>
     /// Defines the unpacking and packing methods for the selected type
     /// </summary>
@@ -9,23 +8,22 @@ namespace SmartPackager
     public unsafe interface IPackagerMethod<T> : IPackagerMethodGeneric
     {
         /// <summary>
-        /// Packs an object into an array of bytes
+        /// Packs data into a buffer
         /// </summary>
-        /// <param name="destination">pointer to the beginning of the recording</param>
-        /// <param name="source">object to record</param>
-        /// <returns>how many bytes were written</returns>
-        int PackUP(byte* destination, T source);
+        /// <param name="writer">packaging interface</param>
+        /// <param name="source">packing data</param>
+        void PackUP(ref ByteWriter writer, T source);
         /// <summary>
-        /// Unpacks an object from an array of bytes
+        /// Unpacking data from the buffer
         /// </summary>
-        /// <param name="source">pointer to the beginning of reading</param>
-        /// <param name="destination">finished object</param>
-        /// <returns>how many bytes were read</returns>
-        int UnPack(byte* source, out T destination);
+        /// <param name="reader">unpacking interface</param>
+        /// <param name="destination">data to be unpacked</param>
+        void UnPack(ref ByteReader reader, out T destination);
         /// <summary>
+        /// Calculate the required size when packing
         /// </summary>
-        /// <param name="source">target</param>
-        /// <returns>Object size in bytes</returns>
-        int GetSize(T source);
+        /// <param name="meter">buffer length measurement interface</param>
+        /// <param name="source">the object for which you need to calculate the size size</param>
+        void GetSize(ref ByteMeter meter, T source);
     }
 }

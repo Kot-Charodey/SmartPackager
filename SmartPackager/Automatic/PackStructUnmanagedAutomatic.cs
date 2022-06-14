@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartPackager.ByteStack;
+using System;
 
 namespace SmartPackager.Automatic
 {
@@ -13,21 +14,19 @@ namespace SmartPackager.Automatic
 
         }
 
-        public unsafe int PackUP(byte* destination, T source)
+        public void PackUP(ref ByteWriter writer, T source)
         {
-            *(T*)destination = source;
-            return sizeof(T);
+            writer.Write(source);
         }
 
-        public unsafe int UnPack(byte* source, out T destination)
+        public void UnPack(ref ByteReader reader, out T destination)
         {
-            destination = *(T*)source;
-            return sizeof(T);
+            destination = reader.Read<T>();
         }
 
-        public unsafe int GetSize(T source)
+        public void GetSize(ref ByteMeter meter, T source)
         {
-            return sizeof(T);
+            meter.Add<T>();
         }
     }
 }

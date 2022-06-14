@@ -1,4 +1,4 @@
-using SmartPackager.BitStream;
+using SmartPackager.ByteStack;
 
 namespace UnitTest
 {

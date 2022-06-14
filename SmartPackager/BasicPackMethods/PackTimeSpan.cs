@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartPackager.ByteStack;
+using System;
 
 namespace SmartPackager.BasicPackMethods
 {
@@ -8,22 +9,19 @@ namespace SmartPackager.BasicPackMethods
 
         public bool IsFixedSize => true;
 
-        public unsafe int PackUP(byte* destination, TimeSpan source)
+        public void PackUP(ref ByteWriter writer, TimeSpan source)
         {
-            *(long*)destination = source.Ticks;
-            return sizeof(long);
+            writer.Write(source.Ticks);
         }
 
-        public unsafe int UnPack(byte* source, out TimeSpan destination)
+        public void UnPack(ref ByteReader reader, out TimeSpan destination)
         {
-            TimeSpan pt = new TimeSpan(*(long*)source);
-            destination = pt;
-            return sizeof(long);
+            destination = new TimeSpan(reader.Read<long>());
         }
 
-        public int GetSize(TimeSpan source)
+        public void GetSize(ref ByteMeter meter, TimeSpan source)
         {
-            return sizeof(long);
+            meter.Add<long>();
         }
     }
 }

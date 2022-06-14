@@ -1,5 +1,6 @@
 ﻿namespace SmartPackager
 {
+    using ByteStack;
     /// <summary>
     /// Creates a packer for the selected set of types
     /// </summary>
@@ -10,7 +11,7 @@
 
         internal static IPackagerMethod<T> GetMethods<T>()
         {
-            lock (Sync) //немного потокобезопасности
+            lock (Sync) //for thread safety
             {
                 if (!SetupDone)
                 {
@@ -59,7 +60,7 @@
         {
             return new M<T1>(GetMethods<T1>());
         }
-        
+#if TODO
         /// <summary>
         /// Creates a packer for the selected set of types
         /// </summary>
@@ -212,9 +213,10 @@
         {
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>(), GetMethods<T17>(), GetMethods<T18>(), GetMethods<T19>(), GetMethods<T20>());
         }
-        #endregion
+#endif
+#endregion
 
-        #region M1
+#region M1
         /// <summary>
         /// Packer
         /// </summary>
@@ -233,60 +235,51 @@
             /// <returns></returns>
             public int CalcNeedSize(T1 t1)
             {
-                return Ipm1.GetSize(t1);
+                ByteMeter meter = new ByteMeter();
+                Ipm1.GetSize(ref meter, t1);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe int PackUP(byte* destination, T1 t1)
+            public void PackUP(byte[] destination, int offset, T1 t1)
             {
-                return Ipm1.PackUP(destination, t1);
-            }
-            /// <summary>
-            /// Packs data into an array
-            /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1)
-            {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    byte* point = dest;
-                    Ipm1.PackUP(point, t1);
-                }
+                    ByteWriter writer = new ByteWriter(array);
+                    Ipm1.PackUP(ref writer, t1);
+                });
             }
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe byte[] PackUP(T1 t1)
+            public byte[] PackUP(T1 t1)
             {
                 byte[] destination = new byte[CalcNeedSize(t1)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    byte* point = dest;
-                    Ipm1.PackUP(point, t1);
-                }
+                    ByteWriter writer = new ByteWriter(array);
+                    Ipm1.PackUP(ref writer, t1);
+                });
                 return destination;
-            }
-            /// <summary>
-             /// Unpacks data from an array
-             /// </summary>
-            public unsafe int UnPack(byte* source, out T1 t1)
-            {
-                return Ipm1.UnPack(source, out t1);
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
             public unsafe void UnPack(byte[] source, int offset, out T1 t1)
             {
-                fixed (byte* dest = &source[offset])
+                T1 t1_=default;
+                UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
                 {
-                    byte* point = dest;
-                    Ipm1.UnPack(point, out t1);
-                }
+                    ByteReader reader = new ByteReader(array);
+                    Ipm1.UnPack(ref reader, out t1_);
+                });
+                t1 = t1_;
             }
         }
-        #endregion
-        #region M2
+#endregion
+#if TODO
+#region M2
         /// <summary>
         /// Packer
         /// </summary>
@@ -377,8 +370,8 @@
                 }
             }
         }
-        #endregion
-        #region M3
+#endregion
+#region M3
         /// <summary>
         /// Packer
         /// </summary>
@@ -449,8 +442,8 @@
                 }
             }
         }
-        #endregion
-        #region M4
+#endregion
+#region M4
         /// <summary>
         /// Packer
         /// </summary>
@@ -528,8 +521,8 @@
                 }
             }
         }
-        #endregion
-        #region M5
+#endregion
+#region M5
         /// <summary>
         /// Packer
         /// </summary>
@@ -614,8 +607,8 @@
                 }
             }
         }
-        #endregion
-        #region M6
+#endregion
+#region M6
         /// <summary>
         /// Packer
         /// </summary>
@@ -707,8 +700,8 @@
                 }
             }
         }
-        #endregion
-        #region M7
+#endregion
+#region M7
         /// <summary>
         /// Packer
         /// </summary>
@@ -807,8 +800,8 @@
                 }
             }
         }
-        #endregion
-        #region M8
+#endregion
+#region M8
         /// <summary>
         /// Packer
         /// </summary>
@@ -914,8 +907,8 @@
                 }
             }
         }
-        #endregion
-        #region M9
+#endregion
+#region M9
         /// <summary>
         /// Packer
         /// </summary>
@@ -1028,8 +1021,8 @@
                 }
             }
         }
-        #endregion
-        #region M10
+#endregion
+#region M10
         /// <summary>
         /// Packer
         /// </summary>
@@ -1149,8 +1142,8 @@
                 }
             }
         }
-        #endregion
-        #region M11
+#endregion
+#region M11
         /// <summary>
         /// Packer
         /// </summary>
@@ -1277,8 +1270,8 @@
                 }
             }
         }
-        #endregion
-        #region M12
+#endregion
+#region M12
         /// <summary>
         /// Packer
         /// </summary>
@@ -1412,8 +1405,8 @@
                 }
             }
         }
-        #endregion
-        #region M13
+#endregion
+#region M13
         /// <summary>
         /// Packer
         /// </summary>
@@ -1554,8 +1547,8 @@
                 }
             }
         }
-        #endregion
-        #region M14
+#endregion
+#region M14
         /// <summary>
         /// Packer
         /// </summary>
@@ -1703,8 +1696,8 @@
                 }
             }
         }
-        #endregion
-        #region M15
+#endregion
+#region M15
         /// <summary>
         /// Packer
         /// </summary>
@@ -1859,8 +1852,8 @@
                 }
             }
         }
-        #endregion
-        #region M16
+#endregion
+#region M16
         /// <summary>
         /// Packer
         /// </summary>
@@ -2022,8 +2015,8 @@
                 }
             }
         }
-        #endregion
-        #region M17
+#endregion
+#region M17
         /// <summary>
         /// Packer
         /// </summary>
@@ -2192,8 +2185,8 @@
                 }
             }
         }
-        #endregion
-        #region M18
+#endregion
+#region M18
         /// <summary>
         /// Packer
         /// </summary>
@@ -2369,8 +2362,8 @@
                 }
             }
         }
-        #endregion
-        #region M19
+#endregion
+#region M19
         /// <summary>
         /// Packer
         /// </summary>
@@ -2554,8 +2547,8 @@
                 }
             }
         }
-        #endregion
-        #region M20
+#endregion
+#region M20
         /// <summary>
         /// Packer
         /// </summary>
@@ -2746,6 +2739,7 @@
                 }
             }
         }
-        #endregion
+#endregion
+#endif
     }
  }

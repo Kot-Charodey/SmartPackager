@@ -3,22 +3,25 @@
 #if DEBUG
 [assembly: InternalsVisibleTo("UnitTest")]
 #endif
-namespace SmartPackager.BitStream
+namespace SmartPackager.ByteStack
 {
+
     /// <summary>
     /// Записывает данные в массив
     /// </summary>
     public struct ByteWriter
     {
         private readonly UnsafeArray UnsafeArray;
+        private readonly RefArray RefArray;
         private int Pos;
 
         internal ByteWriter(UnsafeArray unsafeArray)
         {
             UnsafeArray = unsafeArray;
+            RefArray = new RefArray();
             Pos = 0;
         }
-        
+
         public unsafe void Write<T>(T val) where T : unmanaged
         {
             UnsafeArray.Set(Pos, val);
@@ -44,18 +47,33 @@ namespace SmartPackager.BitStream
         }
 
         /// <summary>
-        /// Создаёт ссылку на текущию позицию
+        /// Создаёт ссылку на объект
         /// </summary>
-        /// <returns>ссылка</returns>
-        public ByteRef MakeReference()
+        /// <returns>вернёт true если данный объект упаковывается в первые и не null (иначе упаковывать не надо)</returns>
+        public bool MakeReference(object val)
         {
-            return new ByteRef(Pos);
-        }
-
-        public void WriteReference(ByteRef byteRef)
-        {
-            UnsafeArray.Set(Pos, byteRef.GetPoint());
-            Pos += sizeof(int);
+            if (val == null)
+            {
+                UnsafeArray.Set(Pos, RefPoint.NULL);
+                Pos += sizeof(int);
+                return false;
+            }
+            else
+            {
+                if (RefArray.Exists(val, out var point))
+                {
+                    UnsafeArray.Set(Pos, point.Point);
+                    Pos += sizeof(int);
+                    return false;
+                }
+                else
+                {
+                    UnsafeArray.Set(Pos, RefPoint.DATA);
+                    Pos += sizeof(int);
+                    RefArray.AddRef(new RefPoint(Pos, val));
+                    return true;
+                }
+            }
         }
     }
 }
