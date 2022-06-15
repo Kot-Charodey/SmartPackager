@@ -1,44 +1,54 @@
-﻿namespace SmartPackager
+﻿using System;
+using System.Threading;
+
+namespace SmartPackager
 {
     using ByteStack;
+
     /// <summary>
     /// Creates a packer for the selected set of types
     /// </summary>
     public static class Packager
     {
         internal static bool SetupDone=false;
-        private readonly static object Sync = new object();
+
+        private readonly static Semaphore semaphore = new Semaphore(1,1);
 
         internal static IPackagerMethod<T> GetMethods<T>()
         {
-            lock (Sync) //for thread safety
+            semaphore.WaitOne(); //Потокобезопасность - если из разных потоков попытаются сгенерить упаковщик
+            if (!SetupDone)
             {
-                if (!SetupDone)
-                {
-                    PackMethods.SetupPackMethods();
-                    SetupDone = true;
-                }
+                PackMethods.SetupPackMethods();
+                SetupDone = true;
+            }
 
-                //searches for a method implementation for this type or tries to generate
-                if (PackMethods.PackMethodsDictionary.TryGetValue(typeof(T), out IPackagerMethodGeneric ipm))
-                {
-                    return (IPackagerMethod<T>)ipm;
-                }
-                //TODO я забыл как это работет + надо проеоментировать
-                else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(typeof(T).GetFullName(), out var type))
-                {
-                    return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(type);
-                }
-                else if (typeof(T).IsUnManaged())
-                {
-                    //создаёт новый упаковщик неуправляймого типа
-                    return (IPackagerMethod<T>)Automatic.PackStructUnmanagedAutomaticExtension.Make<T>();
-                }
-                else
-                {
-                    //создаёт новый упаковщик управляймого типа
-                    return (IPackagerMethod<T>)Automatic.PackStructManagedAutomaticExtension.Make<T>();
-                }
+            Type needType = typeof(T);
+
+            //searches for a method implementation for this type or tries to generate
+            if (PackMethods.PackMethodsDictionary.TryGetValue(needType, out IPackagerMethodGeneric ipm))
+            {
+                return (IPackagerMethod<T>)ipm;
+            }
+            //поиск среди закэшеированных созданных универсальных типов из PackMethods.PackGenericNoCreatedMethodsDictionary
+            else if (Automatic.GenericFactoryExtension.Cache.TryGetValue(needType, out var type))
+            {
+                return (IPackagerMethod<T>)type;
+            }
+            //поиск среди найденных универсальных типов
+            else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(needType.GetFullName(), out var genType))
+            {
+                return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(genType);
+            }
+            else if (needType.IsUnManaged())
+            {
+                //создаёт новый упаковщик неуправляймого типа
+                return (IPackagerMethod<T>)Automatic.PackStructUnmanagedAutomaticExtension.Make<T>();
+            }
+            else
+            {
+                //создаёт новый упаковщик управляймого типа
+                return (IPackagerMethod<T>)Automatic.PackStructManagedAutomaticExtension.Make<T>();
             }
         }
 
