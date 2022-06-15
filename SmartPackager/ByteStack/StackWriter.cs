@@ -9,41 +9,49 @@ namespace SmartPackager.ByteStack
     /// <summary>
     /// Записывает данные в массив
     /// </summary>
-    public struct ByteWriter
+    public struct StackWriter
     {
         private readonly UnsafeArray UnsafeArray;
         private readonly RefArray RefArray;
         private int Pos;
 
-        internal ByteWriter(UnsafeArray unsafeArray)
+        internal StackWriter(UnsafeArray unsafeArray)
         {
             UnsafeArray = unsafeArray;
             RefArray = new RefArray();
             Pos = 0;
         }
 
+        /// <summary>
+        /// Записать значение
+        /// </summary>
+        /// <typeparam name="T">тип значения</typeparam>
+        /// <param name="val">значение</param>
         public unsafe void Write<T>(T val) where T : unmanaged
         {
             UnsafeArray.Set(Pos, val);
             Pos += sizeof(T);
         }
 
+        /// <summary>
+        /// Записать неуправляймый массив
+        /// </summary>
+        /// <typeparam name="T">тип массива</typeparam>
+        /// <param name="val">массив</param>
         public unsafe void Write<T>(T[] val) where T : unmanaged
         {
             UnsafeArray.Set(Pos, val);
             Pos += sizeof(T) * val.Length;
         }
 
+        /// <summary>
+        /// Записать длинну чего-либо(число)
+        /// </summary>
+        /// <param name="length">число</param>
         public void WriteLength(int length)
         {
             UnsafeArray.Set(Pos, length);
             Pos += sizeof(int);
-        }
-
-        public void WriteExists(bool exists)
-        {
-            UnsafeArray.Set(Pos, exists);
-            Pos += sizeof(bool);
         }
 
         /// <summary>

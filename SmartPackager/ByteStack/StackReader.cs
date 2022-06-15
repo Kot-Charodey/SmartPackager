@@ -7,7 +7,7 @@ namespace SmartPackager.ByteStack
     /// <summary>
     /// Считывает данные из буфера
     /// </summary>
-    public struct ByteReader
+    public struct StackReader
     {
         /// <summary>
         /// Статус потока
@@ -38,7 +38,7 @@ namespace SmartPackager.ByteStack
         private RefPoint Point_;
         private object GetObject_;
 
-        internal ByteReader(UnsafeArray unsafeArray):this()
+        internal StackReader(UnsafeArray unsafeArray):this()
         {
             UnsafeArray = unsafeArray;
             Pos = 0;
@@ -58,7 +58,7 @@ namespace SmartPackager.ByteStack
         /// Считать значение из буфера
         /// </summary>
         /// <typeparam name="T">тип значения</typeparam>
-        /// <returns>считаное значение</returns>
+        /// <returns>значение</returns>
         public unsafe T Read<T>() where T : unmanaged
         {
             CheckState(StreamState.Default);
@@ -67,6 +67,12 @@ namespace SmartPackager.ByteStack
             return data;
         }
 
+        /// <summary>
+        /// Считать неуправляймый массив
+        /// </summary>
+        /// <typeparam name="T">тип массива</typeparam>
+        /// <param name="length">длинна массива</param>
+        /// <returns>массив</returns>
         public unsafe T[] Read<T>(int length) where T : unmanaged
         {
             CheckState(StreamState.Default);
@@ -75,20 +81,16 @@ namespace SmartPackager.ByteStack
             return data;
         }
 
+        /// <summary>
+        /// Считать длинну
+        /// </summary>
+        /// <returns></returns>
         public int ReadLength()
         {
             CheckState(StreamState.Default);
             var len = UnsafeArray.Get<int>(Pos);
             Pos += sizeof(int);
             return len;
-        }
-
-        public bool ReadExists()
-        {
-            CheckState(StreamState.Default);
-            var exists = UnsafeArray.Get<bool>(Pos);
-            Pos += sizeof(bool);
-            return exists;
         }
 
         /// <summary>
@@ -120,6 +122,10 @@ namespace SmartPackager.ByteStack
             }
         }
 
+        /// <summary>
+        /// Указать объект для ссылки
+        /// </summary>
+        /// <param name="val"></param>
         public void AttachReference(object val)
         {
             CheckState(StreamState.WaitAttach);
@@ -128,6 +134,10 @@ namespace SmartPackager.ByteStack
             RefArray.AddRef(Point_);
         }
 
+        /// <summary>
+        /// Получить объект полученный по ссылке
+        /// </summary>
+        /// <returns></returns>
         public object GetReferenceObject()
         {
             CheckState(StreamState.WaitGetObject);

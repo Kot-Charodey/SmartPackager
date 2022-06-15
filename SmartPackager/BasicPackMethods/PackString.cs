@@ -8,7 +8,7 @@ namespace SmartPackager.BasicPackMethods
         public Type TargetType => typeof(string);
         public bool IsFixedSize => false;
 
-        public void PackUP(ref ByteWriter writer, string source)
+        public void PackUP(ref StackWriter writer, string source)
         {
             if (source == null)
             {
@@ -21,7 +21,7 @@ namespace SmartPackager.BasicPackMethods
             }
         }
 
-        public void UnPack(ref ByteReader reader, out string destination)
+        public void UnPack(ref StackReader reader, out string destination)
         {
             int len = reader.ReadLength();
             if (len < 0)
@@ -34,7 +34,7 @@ namespace SmartPackager.BasicPackMethods
             }
         }
 
-        public void GetSize(ref ByteMeter meter, string source)
+        public void GetSize(ref StackMeter meter, string source)
         {
             meter.AddLength();
             if (source != null)

@@ -9,17 +9,17 @@ namespace SmartPackager.BasicPackMethods
 
         public bool IsFixedSize => true;
 
-        public void PackUP(ref ByteWriter writer, TimeSpan source)
+        public void PackUP(ref StackWriter writer, TimeSpan source)
         {
             writer.Write(source.Ticks);
         }
 
-        public void UnPack(ref ByteReader reader, out TimeSpan destination)
+        public void UnPack(ref StackReader reader, out TimeSpan destination)
         {
             destination = new TimeSpan(reader.Read<long>());
         }
 
-        public void GetSize(ref ByteMeter meter, TimeSpan source)
+        public void GetSize(ref StackMeter meter, TimeSpan source)
         {
             meter.Add<long>();
         }

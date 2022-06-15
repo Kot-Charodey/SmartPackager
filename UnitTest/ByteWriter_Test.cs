@@ -13,7 +13,7 @@ namespace UnitTest
         {
             UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.Write(1);
                 writer.Write(2);
                 writer.Write(3);
@@ -29,7 +29,7 @@ namespace UnitTest
         {
             UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.Write(new int[] { 1, 2, 3, 4, 5 });
                 CollectionAssert.AreEqual(array.Get<int>(0, 5), new int[] { 1, 2, 3, 4, 5 });
             });
@@ -40,7 +40,7 @@ namespace UnitTest
         {
             UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.WriteExists(true);
                 Assert.AreEqual(array.Get<bool>(0), true);
             });
@@ -51,7 +51,7 @@ namespace UnitTest
         {
             UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.WriteLength(55);
                 Assert.AreEqual(array.Get<int>(0), 55);
             });
@@ -62,7 +62,7 @@ namespace UnitTest
         {
             UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.WriteReference(new ByteRef(404));
                 Assert.AreEqual(array.Get<int>(0), 404);
             });

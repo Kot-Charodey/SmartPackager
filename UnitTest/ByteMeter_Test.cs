@@ -8,13 +8,13 @@ namespace UnitTest
         [TestMethod]
         public void Test_CalcLength()
         {
-            ByteMeter Meter = new();
+            StackMeter Meter = new();
             Assert.AreEqual(Meter.GetCalcLength(), 0);
         }
         [TestMethod]
         public void Test_Add()
         {
-            ByteMeter Meter = new();
+            StackMeter Meter = new();
             Meter.Add<int>();
             Assert.AreEqual(Meter.GetCalcLength(), 4);
             Meter.Add<int>();
@@ -25,7 +25,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_AddArray()
         {
-            ByteMeter Meter = new();
+            StackMeter Meter = new();
             Meter.Add<int>(5);
             Assert.AreEqual(Meter.GetCalcLength(), 4 * 5);
             Meter.Add<long>();
@@ -34,7 +34,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_AddLength()
         {
-            ByteMeter Meter = new();
+            StackMeter Meter = new();
             Meter.Add<int>();
             Assert.AreEqual(Meter.GetCalcLength(), 4);
             Meter.AddLength();
@@ -45,7 +45,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_AddExists()
         {
-            ByteMeter Meter = new();
+            StackMeter Meter = new();
             Meter.Add<int>();
             Assert.AreEqual(Meter.GetCalcLength(), 4);
             Meter.AddExists();
@@ -56,7 +56,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_AddReference()
         {
-            ByteMeter Meter = new();
+            StackMeter Meter = new();
             Meter.Add<int>();
             Assert.AreEqual(Meter.GetCalcLength(), 4);
             var @ref = Meter.MakeReference();

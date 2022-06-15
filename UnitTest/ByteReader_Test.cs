@@ -4,7 +4,7 @@ namespace UnitTest
 {
     //===========================================================//
     //*********** должен быть отестирован UnsafeArray ************
-    //*********** должен быть отестирован ByteWriter  ************
+    //*********** должен быть отестирован StackWriter  ************
     //===========================================================//
     [TestClass]
     public class ByteReader_Test
@@ -15,7 +15,7 @@ namespace UnitTest
             var arr = new byte[512];
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.Write(1);
                 writer.Write(2);
                 writer.Write(3);
@@ -23,7 +23,7 @@ namespace UnitTest
 
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteReader reader = new(array);
+                StackReader reader = new(array);
                 Assert.AreEqual(reader.Read<int>(), 1);
                 Assert.AreEqual(reader.Read<int>(), 2);
                 Assert.AreEqual(reader.Read<int>(), 3);
@@ -37,13 +37,13 @@ namespace UnitTest
             var testArr = new int[] { 1, 2, 3, 4, 5 };
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.Write(testArr);
             });
 
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteReader reader = new(array);
+                StackReader reader = new(array);
                 CollectionAssert.AreEqual(reader.Read<int>(testArr.Length), testArr);
             });
         }
@@ -54,14 +54,14 @@ namespace UnitTest
             var arr = new byte[512];
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.WriteExists(true);
                 writer.WriteExists(false);
             });
 
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteReader reader = new(array);
+                StackReader reader = new(array);
                 Assert.AreEqual(reader.ReadExists(), true);
                 Assert.AreEqual(reader.ReadExists(), false);
             });
@@ -73,7 +73,7 @@ namespace UnitTest
             var arr = new byte[512];
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.WriteLength(5);
                 writer.WriteLength(25);
                 writer.WriteLength(-1);
@@ -81,7 +81,7 @@ namespace UnitTest
 
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteReader reader = new(array);
+                StackReader reader = new(array);
                 Assert.AreEqual(reader.ReadLength(), 5);
                 Assert.AreEqual(reader.ReadLength(), 25);
                 Assert.AreEqual(reader.ReadLength(), -1);
@@ -95,7 +95,7 @@ namespace UnitTest
             var arr = new byte[512];
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteWriter writer = new(array);
+                StackWriter writer = new(array);
                 writer.WriteLength(5);
                 var @ref = writer.MakeReference();
                 writer.WriteLength(25);
@@ -106,7 +106,7 @@ namespace UnitTest
 
             UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
             {
-                ByteReader reader = new(array);
+                StackReader reader = new(array);
                 Assert.AreEqual(reader.ReadLength(), 5);
                 Assert.AreEqual(reader.ReadLength(), 25);
                 Assert.AreEqual(reader.ReadLength(), -1);

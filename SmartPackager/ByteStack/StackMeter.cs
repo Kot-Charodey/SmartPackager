@@ -3,7 +3,7 @@
     /// <summary>
     /// Расчитывает размер данных, которые необходимо упаковать
     /// </summary>
-    public struct ByteMeter
+    public struct StackMeter
     {
         private int Length;
         private readonly RefArray RefArray;
@@ -39,14 +39,6 @@
         public void AddLength()
         {
             Length += sizeof(int);
-        }
-
-        /// <summary>
-        /// Добавить в расчёт флаг указывающий на существования чего либо
-        /// </summary>
-        public void AddExists()
-        {
-            Length += sizeof(bool);
         }
 
         /// <summary>

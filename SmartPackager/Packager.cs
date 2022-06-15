@@ -24,16 +24,19 @@
                 {
                     return (IPackagerMethod<T>)ipm;
                 }
+                //TODO я забыл как это работет + надо проеоментировать
                 else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(typeof(T).GetFullName(), out var type))
                 {
                     return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(type);
                 }
                 else if (typeof(T).IsUnManaged())
                 {
+                    //создаёт новый упаковщик неуправляймого типа
                     return (IPackagerMethod<T>)Automatic.PackStructUnmanagedAutomaticExtension.Make<T>();
                 }
                 else
                 {
+                    //создаёт новый упаковщик управляймого типа
                     return (IPackagerMethod<T>)Automatic.PackStructManagedAutomaticExtension.Make<T>();
                 }
             }
@@ -235,7 +238,7 @@
             /// <returns></returns>
             public int CalcNeedSize(T1 t1)
             {
-                ByteMeter meter = new ByteMeter();
+                StackMeter meter = new StackMeter();
                 Ipm1.GetSize(ref meter, t1);
                 return meter.GetCalcLength();
             }
@@ -246,7 +249,7 @@
             {
                 UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    ByteWriter writer = new ByteWriter(array);
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                 });
             }
@@ -258,7 +261,7 @@
                 byte[] destination = new byte[CalcNeedSize(t1)];
                 UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    ByteWriter writer = new ByteWriter(array);
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                 });
                 return destination;
@@ -271,7 +274,7 @@
                 T1 t1_=default;
                 UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
                 {
-                    ByteReader reader = new ByteReader(array);
+                    StackReader reader = new StackReader(array);
                     Ipm1.UnPack(ref reader, out t1_);
                 });
                 t1 = t1_;

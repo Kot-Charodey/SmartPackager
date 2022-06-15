@@ -9,6 +9,9 @@ namespace SmartPackager
     /// </summary>
     public static class PackMethods
     {
+        /// <summary>
+        /// Закешированные упаковщики
+        /// </summary>
         internal static Dictionary<Type, IPackagerMethodGeneric> PackMethodsDictionary = new Dictionary<Type, IPackagerMethodGeneric>();
         internal static Dictionary<string, Type> PackGenericNoCreatedMethodsDictionary = new Dictionary<string, Type>();
 

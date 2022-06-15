@@ -9,22 +9,17 @@ namespace SmartPackager.Automatic
 
         public bool IsFixedSize => true;
 
-        internal PackStructUnmanagedAutomatic()
-        {
-
-        }
-
-        public void PackUP(ref ByteWriter writer, T source)
+        public void PackUP(ref StackWriter writer, T source)
         {
             writer.Write(source);
         }
 
-        public void UnPack(ref ByteReader reader, out T destination)
+        public void UnPack(ref StackReader reader, out T destination)
         {
             destination = reader.Read<T>();
         }
 
-        public void GetSize(ref ByteMeter meter, T source)
+        public void GetSize(ref StackMeter meter, T source)
         {
             meter.Add<T>();
         }
