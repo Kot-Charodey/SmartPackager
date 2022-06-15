@@ -10,9 +10,12 @@ namespace SmartPackager
     public static class PackMethods
     {
         /// <summary>
-        /// Закешированные упаковщики
+        /// Реализованные в ручную упаковщики типов (заполняется поиском через рефлексию)
         /// </summary>
         internal static Dictionary<Type, IPackagerMethodGeneric> PackMethodsDictionary = new Dictionary<Type, IPackagerMethodGeneric>();
+        /// <summary>
+        /// Реализованные в ручную универсальные типы, их необходимо инициализировать под определённый тип (заполняется поиском через рефлексию)
+        /// </summary>
         internal static Dictionary<string, Type> PackGenericNoCreatedMethodsDictionary = new Dictionary<string, Type>();
 
         internal static string GetFullName(this Type type)
@@ -23,7 +26,6 @@ namespace SmartPackager
         /// <summary>
         /// loads data type packaging implementations
         /// </summary>
-        /// <returns></returns>
         internal static void SetupPackMethods()
         {
             PackMethodsDictionary.Clear();
