@@ -10,9 +10,9 @@ namespace SmartPackager
     /// </summary>
     public static class Packager
     {
-        internal static bool SetupDone=false;
+        internal static bool SetupDone = false;
 
-        private readonly static Semaphore semaphore = new Semaphore(1,1);
+        private readonly static Semaphore semaphore = new Semaphore(1, 1);
 
         internal static IPackagerMethod<T> GetMethods<T>()
         {
@@ -43,12 +43,12 @@ namespace SmartPackager
             else if (needType.IsUnManaged())
             {
                 //создаёт новый упаковщик неуправляймого типа
-                return (IPackagerMethod<T>)Automatic.PackStructUnmanagedAutomaticExtension.Make<T>();
+                return (IPackagerMethod<T>)Automatic.PackUnmanagedAutomaticExtension.Make<T>();
             }
             else
             {
                 //создаёт новый упаковщик управляймого типа
-                return (IPackagerMethod<T>)Automatic.PackStructManagedAutomaticExtension.Make<T>();
+                return (IPackagerMethod<T>)Automatic.PackManagedAutomaticExtension.Make<T>();
             }
         }
 
@@ -73,7 +73,6 @@ namespace SmartPackager
         {
             return new M<T1>(GetMethods<T1>());
         }
-#if TODO
         /// <summary>
         /// Creates a packer for the selected set of types
         /// </summary>
@@ -226,10 +225,10 @@ namespace SmartPackager
         {
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>(), GetMethods<T17>(), GetMethods<T18>(), GetMethods<T19>(), GetMethods<T20>());
         }
-#endif
-#endregion
 
-#region M1
+        #endregion
+
+        #region M1
         /// <summary>
         /// Packer
         /// </summary>
@@ -281,7 +280,7 @@ namespace SmartPackager
             /// </summary>
             public unsafe void UnPack(byte[] source, int offset, out T1 t1)
             {
-                T1 t1_=default;
+                T1 t1_ = default;
                 UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
                 {
                     StackReader reader = new StackReader(array);
@@ -290,9 +289,8 @@ namespace SmartPackager
                 t1 = t1_;
             }
         }
-#endregion
-#if TODO
-#region M2
+        #endregion
+        #region M2
         /// <summary>
         /// Packer
         /// </summary>
@@ -383,8 +381,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M3
+        #endregion
+        #region M3
         /// <summary>
         /// Packer
         /// </summary>
@@ -455,8 +453,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M4
+        #endregion
+        #region M4
         /// <summary>
         /// Packer
         /// </summary>
@@ -534,8 +532,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M5
+        #endregion
+        #region M5
         /// <summary>
         /// Packer
         /// </summary>
@@ -620,8 +618,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M6
+        #endregion
+        #region M6
         /// <summary>
         /// Packer
         /// </summary>
@@ -713,8 +711,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M7
+        #endregion
+        #region M7
         /// <summary>
         /// Packer
         /// </summary>
@@ -813,8 +811,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M8
+        #endregion
+        #region M8
         /// <summary>
         /// Packer
         /// </summary>
@@ -920,8 +918,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M9
+        #endregion
+        #region M9
         /// <summary>
         /// Packer
         /// </summary>
@@ -1034,8 +1032,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M10
+        #endregion
+        #region M10
         /// <summary>
         /// Packer
         /// </summary>
@@ -1155,8 +1153,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M11
+        #endregion
+        #region M11
         /// <summary>
         /// Packer
         /// </summary>
@@ -1283,8 +1281,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M12
+        #endregion
+        #region M12
         /// <summary>
         /// Packer
         /// </summary>
@@ -1418,8 +1416,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M13
+        #endregion
+        #region M13
         /// <summary>
         /// Packer
         /// </summary>
@@ -1560,8 +1558,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M14
+        #endregion
+        #region M14
         /// <summary>
         /// Packer
         /// </summary>
@@ -1709,8 +1707,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M15
+        #endregion
+        #region M15
         /// <summary>
         /// Packer
         /// </summary>
@@ -1865,8 +1863,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M16
+        #endregion
+        #region M16
         /// <summary>
         /// Packer
         /// </summary>
@@ -2028,8 +2026,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M17
+        #endregion
+        #region M17
         /// <summary>
         /// Packer
         /// </summary>
@@ -2198,8 +2196,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M18
+        #endregion
+        #region M18
         /// <summary>
         /// Packer
         /// </summary>
@@ -2375,8 +2373,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M19
+        #endregion
+        #region M19
         /// <summary>
         /// Packer
         /// </summary>
@@ -2560,8 +2558,8 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#region M20
+        #endregion
+        #region M20
         /// <summary>
         /// Packer
         /// </summary>
@@ -2752,7 +2750,6 @@ namespace SmartPackager
                 }
             }
         }
-#endregion
-#endif
+        #endregion
     }
- }
+}

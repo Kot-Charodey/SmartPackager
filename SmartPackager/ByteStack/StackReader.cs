@@ -135,14 +135,15 @@ namespace SmartPackager.ByteStack
         }
 
         /// <summary>
-        /// Получить объект полученный по ссылке
+        /// Получить объект указанный по ссылке
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public object GetReferenceObject()
+        public T GetReferenceObject<T>()
         {
             CheckState(StreamState.WaitGetObject);
             State = StreamState.Default;
-            return GetObject_;
+            return (T)GetObject_;
         }
     }
 }

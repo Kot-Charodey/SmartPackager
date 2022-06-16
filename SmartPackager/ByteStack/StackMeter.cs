@@ -42,6 +42,14 @@
         }
 
         /// <summary>
+        /// Добавляет размер который был посчитан зарание
+        /// </summary>
+        public void AddFixedSize(int size)
+        {
+            Length += size;
+        }
+
+        /// <summary>
         /// Создаёт ссылку на объект
         /// </summary>
         /// <returns>вернёт true если данный объект упаковывается в первые и не null (иначе упаковывать не надо)</returns>

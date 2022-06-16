@@ -3,7 +3,7 @@ using System;
 
 namespace SmartPackager.Automatic
 {
-    internal class PackStructUnmanagedAutomatic<T> : IPackagerMethod<T> where T : unmanaged
+    internal class PackUnmanagedAutomatic<T> : IPackagerMethod<T> where T : unmanaged
     {
         public Type TargetType => typeof(T);
 

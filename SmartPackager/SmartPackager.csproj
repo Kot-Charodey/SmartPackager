@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -48,16 +48,18 @@
   <ItemGroup>
     <Compile Include="Automatic\FastGetSetValue.cs" />
     <Compile Include="Automatic\GenericFactoryExtension.cs" />
+    <Compile Include="Automatic\MethodUtil.cs" />
     <Compile Include="Automatic\NotPackAttribute.cs" />
-    <Compile Include="Automatic\RefObject.cs" />
+    <Compile Include="Automatic\PackManagedDelegates.cs" />
+    <Compile Include="Automatic\PackManagedAutomatic.cs" />
     <Compile Include="Automatic\SearchPrivateFieldsAttribute.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticContainer.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticExtension_PackArray.cs" />
+    <Compile Include="Automatic\PackManagedAutomaticExtension_Container.cs" />
+    <Compile Include="Automatic\PackManagedAutomaticExtension_PackArray.cs" />
     <Compile Include="BasicPackMethods\PackTimeSpan.cs" />
     <Compile Include="BasicPackMethods\PackString.cs" />
     <Compile Include="BasicPackMethods\PackDateTime.cs" />
-    <Compile Include="Automatic\PackStructManagedAutomaticExtension_Main.cs" />
-    <Compile Include="Automatic\PackStructUnmanagedAutomatic.cs" />
+    <Compile Include="Automatic\PackManagedAutomaticExtension.cs" />
+    <Compile Include="Automatic\PackUnmanagedAutomatic.cs" />
     <Compile Include="ByteStack\StackMeter.cs" />
     <Compile Include="ByteStack\StackReader.cs" />
     <Compile Include="ByteStack\StackWriter.cs" />
@@ -68,7 +70,7 @@
     <Compile Include="Packager.cs" />
     <Compile Include="IPackagerMethod.cs" />
     <Compile Include="PackMethods.cs" />
-    <Compile Include="Automatic\PackStructUnmanagedAutomaticExtension.cs" />
+    <Compile Include="Automatic\PackUnmanagedAutomaticExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnmanagedTypeExtensios.cs" />
   </ItemGroup>

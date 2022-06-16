@@ -7,9 +7,9 @@ namespace SmartPackager.Automatic
     /// <summary>
     /// allows you to get a PackStructUnmanaged of the desired type
     /// </summary>
-    internal static class PackStructUnmanagedAutomaticExtension
+    internal static class PackUnmanagedAutomaticExtension
     {
-        private static MethodInfo GetPackFromType_MethodInfo => typeof(PackStructUnmanagedAutomaticExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
+        private static MethodInfo GetPackFromType_MethodInfo => typeof(PackUnmanagedAutomaticExtension).GetMethod("GetPackFromType", BindingFlags.NonPublic | BindingFlags.Static);
         internal static Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
         
         /// <summary>
@@ -40,7 +40,7 @@ namespace SmartPackager.Automatic
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "Reflection.Invoke")]
         private static IPackagerMethodGeneric GetPackFromType<T>() where T : unmanaged
         {
-            return new PackStructUnmanagedAutomatic<T>();
+            return new PackUnmanagedAutomatic<T>();
         }
     }
 }
