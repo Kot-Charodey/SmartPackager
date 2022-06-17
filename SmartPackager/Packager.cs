@@ -14,6 +14,11 @@ namespace SmartPackager
 
         private readonly static Semaphore semaphore = new Semaphore(1, 1);
 
+        /// <summary>
+        /// Генерирует метод упаковки (основной метод)
+        /// </summary>
+        /// <typeparam name="T">тип для которого будет сгенерирован упаковщик</typeparam>
+        /// <returns></returns>
         internal static IPackagerMethod<T> GetMethods<T>()
         {
             semaphore.WaitOne(); //Потокобезопасность - если из разных потоков попытаются сгенерить упаковщик
@@ -227,6 +232,8 @@ namespace SmartPackager
         }
 
         #endregion
+
+        //Классы созданных упаковщиков (для групповой упаковки нескольких типов от 1 до 20 - в случае использования в библиотеке EMI)
 
         #region M1
         /// <summary>

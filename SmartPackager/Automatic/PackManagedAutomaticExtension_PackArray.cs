@@ -8,25 +8,6 @@ namespace SmartPackager.Automatic
 
     internal static class PackManagedAutomaticExtension_PackArray
     {
-        /*
-        private static MethodInfo UnsafeGetSizeFixed_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeGetSizeFixed", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafePackUPFixed_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafePackUPFixed", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafeUnPackFixed_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeUnPackFixed", BindingFlags.NonPublic | BindingFlags.Static);
-
-        private static MethodInfo UnsafePackUPFixedMemoryCopy_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafePackUPFixedMemoryCopy", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafeUnPackFixedMemoryCopy_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeUnPackFixedMemoryCopy", BindingFlags.NonPublic | BindingFlags.Static);
-
-
-        private static MethodInfo UnsafeGetSizeDynamic_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeGetSizeDynamic", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafePackUPDynamic_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafePackUPDynamic", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafeUnPackDynamic_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeUnPackDynamic", BindingFlags.NonPublic | BindingFlags.Static);
-
-
-        private static MethodInfo UnsafeGetSizeDynamicHeap_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeGetSizeDynamicHeap", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafePackUPDynamicHeap_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafePackUPDynamicHeap", BindingFlags.NonPublic | BindingFlags.Static);
-        private static MethodInfo UnsafeUnPackDynamicHeap_MethodInfo => typeof(ArrayUtil).GetMethod("UnsafeUnPackDynamicHeap", BindingFlags.NonPublic | BindingFlags.Static);
-        */
-
         private static MethodInfo PackArray_MethodInfo => typeof(PMAE).GetMethod(nameof(PMAE.PackArray), MethodUtil.BindingFind);
         private static MethodInfo PackArrayRankOne_MethodInfo => typeof(PMAE).GetMethod(nameof(PMAE.PackArrayRankOne), MethodUtil.BindingFind);
 
@@ -68,6 +49,7 @@ namespace SmartPackager.Automatic
                 }
             }
 
+            pma.MainPackUp = MainPackUp;
 
             if (pack.IsFixedSize && typeof(TElement).IsUnManaged())
             {
@@ -116,14 +98,10 @@ namespace SmartPackager.Automatic
                     getSize(ref meter, source);
                 }
             }
-
-
-            pma.MainPackUp = MainPackUp;
             pma.MainGetSize = MainGetSize;
 
             if (pack.IsFixedSize)
             {
-
                 var meterLocal = new StackMeter();
                 pack.GetSize(ref meterLocal, default);
                 int oneSize = meterLocal.GetCalcLength();
@@ -134,33 +112,38 @@ namespace SmartPackager.Automatic
                 }
 
                 pma.MembersGetSize = GetSize;
-
-                if (typeof(TElement).IsUnManaged())
-                {
-                    MemoryCopy(pma);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                    //md.Action_PackUP = ArrayUtil.PackUPFixed<TArray, TElement>(pack);
-                    //md.Action_UnPack = ArrayUtil.UnPackFixed<TArray, TElement>(pack);
-                }
             }
             else
             {
-                throw new NotImplementedException();
-                //if (pack is PackStructManagedAutomaticHeap<TElement> psma)
-                //{
-                //    md.Action_GetSize = ArrayUtil.GetSizeDynamicHeap<TArray, TElement>(psma);
-                //    md.Action_PackUP = ArrayUtil.PackUPDynamicHeap<TArray, TElement>(psma);
-                //    md.Action_UnPack = ArrayUtil.UnPackDynamicHeap<TArray, TElement>(psma);
-                //}
-                //else
-                //{
-                //    md.Action_GetSize = ArrayUtil.GetSizeDynamic<TArray, TElement>(pack);
-                //    md.Action_PackUP = ArrayUtil.PackUPDynamic<TArray, TElement>(pack);
-                //    md.Action_UnPack = ArrayUtil.UnPackDynamic<TArray, TElement>(pack);
-                //}
+                void GetSize(ref StackMeter meter, TElement[] source)
+                {
+                    for (int i = 0; i < source.Length; i++)
+                        pack.GetSize(ref meter, source[i]);
+                }
+
+                pma.MembersGetSize = GetSize;
+            }
+
+            if (typeof(TElement).IsUnManaged())
+            {
+                MemoryCopy(pma);
+            }
+            else
+            {
+                void MemberPackUP(ref StackWriter writer, TElement[] source)
+                {
+                    for (int i = 0; i < source.Length; i++)
+                        pack.PackUP(ref writer, source[i]);
+                }
+
+                void MemberUnPack(ref StackReader reader, ref TElement[] destination)
+                {
+                    for (int i = 0; i < destination.Length; i++)
+                        pack.UnPack(ref reader, out destination[i]);
+                }
+
+                pma.MembersPackUp = MemberPackUP;
+                pma.MembersUnPack = MemberUnPack;
             }
         }
 

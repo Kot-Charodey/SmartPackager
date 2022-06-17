@@ -5,17 +5,21 @@ namespace SmartPackager.Automatic
 {
     /// <summary>
     /// Используется автоматическим упаковщиком
+    /// Упаковка разделена на 2 этапа:
+    /// 1 - главный метод упаковщика (инициализирующий), работающий с сылками и создающий объект
+    /// 2 - упаковщики отдельных полей
     /// </summary>
     internal class PackManagedAutomatic<T> : IPackagerMethod<T>
     {
         public Type TargetType { get; set; }
         public bool IsFixedSize { get; set; }
 
+        //упаковщики полей
         public GenericGetSize<T> MembersGetSize;
         public GenericPackUP<T> MembersPackUp;
         public GenericUnPack<T> MembersUnPack;
 
-
+        //инициализирующий упаковщик
         public GenericGetSizeMain<T> MainGetSize;
         public GenericPackUPMain<T> MainPackUp;
         public GenericUnPackMain<T> MainUnPack;

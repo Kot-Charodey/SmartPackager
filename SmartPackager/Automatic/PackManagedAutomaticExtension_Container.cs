@@ -68,7 +68,6 @@ namespace SmartPackager.Automatic
             return pma;
         }
 
-        // size + sizeof(byte); - null flag
         private static class Container
         {
             private static MethodInfo PackExtension_MethodInfo => typeof(Container).GetMethod(nameof(Container.PackExtension), MethodUtil.BindingFind);
@@ -88,17 +87,20 @@ namespace SmartPackager.Automatic
                 pma.IsFixedSize = false;
                 bool inLocalFixedSize = true;
 
+                //заполняет укаковщики полей + устанавливает флаг - все ли поля фиксированной длинны
                 for (int i = 0; i < membersInfo.Length; i++)
                 {
                     var typeTContainer = typeof(TContainer);
                     var memberInfo = membersInfo[i];
                     var typeTField = memberInfo.GetUnderlyingType();
 
-                    MethodInfo mi = PackExtension_MethodInfo.MakeGenericMethod(typeTContainer, typeTField);
-                    inLocalFixedSize &= ((Delegate_PackExtension<TContainer>)mi.CreateDelegate(typeof(Delegate_PackExtension<TContainer>)))(pma, memberInfo);
+                    var packExtension = PackExtension_MethodInfo.MakeGenericDelegate<Delegate_PackExtension<TContainer>>(typeTContainer, typeTField);
+                    inLocalFixedSize &= packExtension(pma, memberInfo);
                 }
 
-                //if structure
+                //инициализирует основной упаковщик контейнера
+
+                //если это структура
                 if (typeof(TContainer).IsValueType)
                 {
                     void PackUp(ref StackWriter writer, TContainer source, GenericPackUP<TContainer> packUP)
@@ -112,8 +114,7 @@ namespace SmartPackager.Automatic
                         unPack(ref reader, ref destination);
                     }
 
-                    
-
+                    //если все локальные полня фиксированного размера - оптимизируем расчёт размера
                     if (inLocalFixedSize)
                     {
                         var meterLocal = new StackMeter();
@@ -122,10 +123,7 @@ namespace SmartPackager.Automatic
 
                         void GetSize(ref StackMeter meter, TContainer source, GenericGetSize<TContainer> getSize)
                         {
-                            if (meter.MakeReference(source))
-                            {
-                                meter.AddFixedSize(len);
-                            }
+                            meter.AddFixedSize(len);
                         }
 
                         pma.MainGetSize = GetSize;
@@ -143,10 +141,9 @@ namespace SmartPackager.Automatic
                     pma.MainPackUp = PackUp;
                     pma.MainUnPack = UnPack;
                 }
-                else //if class
+                else //если это класс (ссылочный тип)
                 {
-                    MethodInfo mi = CreateClass_MethodInfo.MakeGenericMethod(typeof(TContainer));
-                    Delegate_CreateClass<TContainer> createClass = (Delegate_CreateClass<TContainer>)mi.CreateDelegate(typeof(Delegate_CreateClass<TContainer>));
+                    var createClass = CreateClass_MethodInfo.MakeGenericDelegate<Delegate_CreateClass<TContainer>>();
 
                     void PackUp(ref StackWriter writer, TContainer source, GenericPackUP<TContainer> packUP)
                     {
@@ -163,10 +160,12 @@ namespace SmartPackager.Automatic
                         else
                         {
                             destination = createClass();
+                            reader.AttachReference(destination);
                             unPack(ref reader, ref destination);
                         }
                     }
 
+                    //если все локальные полня фиксированного размера - оптимизируем расчёт размера
                     if (inLocalFixedSize)
                     {
                         var meterLocal = new StackMeter();
@@ -196,7 +195,7 @@ namespace SmartPackager.Automatic
                         pma.MainGetSize = GetSize;
                     }
 
-                    
+
 
                     pma.MainPackUp = PackUp;
                     pma.MainUnPack = UnPack;

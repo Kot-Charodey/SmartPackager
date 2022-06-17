@@ -75,9 +75,11 @@ namespace SmartPackager
                     }
                 }
                 else
+                //если это упаковщик универсального типа
                 {
-
-
+                    //TODO исключить от сюда 
+                    //PackUnmanagedAutomatic
+                    //PackManagedAutomatic
                     var iPackagerMethod = TypeIpm.GetInterface("IPackagerMethod`1");
                     if (iPackagerMethod != null)
                     {
