@@ -3,7 +3,7 @@
 namespace UnitTest
 {
     [TestClass]
-    public class ByteMeter_Test
+    public class StackMeter_Test
     {
         [TestMethod]
         public void Test_CalcLength()
@@ -43,27 +43,19 @@ namespace UnitTest
             Assert.AreEqual(Meter.GetCalcLength(), 16);
         }
         [TestMethod]
-        public void Test_AddExists()
-        {
-            StackMeter Meter = new();
-            Meter.Add<int>();
-            Assert.AreEqual(Meter.GetCalcLength(), 4);
-            Meter.AddExists();
-            Assert.AreEqual(Meter.GetCalcLength(), 5);
-            Meter.Add<long>();
-            Assert.AreEqual(Meter.GetCalcLength(), 13);
-        }
-        [TestMethod]
         public void Test_AddReference()
         {
             StackMeter Meter = new();
-            Meter.Add<int>();
-            Assert.AreEqual(Meter.GetCalcLength(), 4);
-            var @ref = Meter.MakeReference();
-            Assert.AreEqual(Meter.GetCalcLength(), 8);
-            Assert.AreEqual(@ref.GetPoint(), 4);
-            Meter.Add<long>();
-            Assert.AreEqual(Meter.GetCalcLength(), 16);
+            object obA = new();
+            object obB = new();
+            Meter.MakeReference(obA);//4
+            Meter.AddFixedSize(6);//4+6
+            Meter.MakeReference(obA);//4+6+4
+            Meter.MakeReference(null);//4+6+4+4
+            Meter.MakeReference(obB);//4+6+4+4+4
+            Meter.AddFixedSize(2);//4+6+4+4+4+2
+
+            Assert.AreEqual(Meter.GetCalcLength(), 4 + 6 + 4 + 4 + 4 + 2);
         }
     }
 }

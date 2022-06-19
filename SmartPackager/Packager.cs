@@ -11,49 +11,51 @@ namespace SmartPackager
     public static class Packager
     {
         internal static bool SetupDone = false;
-
-        private readonly static Semaphore semaphore = new Semaphore(1, 1);
+        private readonly static object LockObject = new object();
 
         /// <summary>
-        /// Генерирует метод упаковки (основной метод)
+        /// Генерирует или ищит метод упаковки (для внутренего использования)
         /// </summary>
         /// <typeparam name="T">тип для которого будет сгенерирован упаковщик</typeparam>
-        /// <returns></returns>
-        internal static IPackagerMethod<T> GetMethods<T>()
+        /// <returns>метод упаковки</returns>
+        public static IPackagerMethod<T> GetMethod<T>()
         {
-            semaphore.WaitOne(); //Потокобезопасность - если из разных потоков попытаются сгенерить упаковщик
-            if (!SetupDone)
-            {
-                PackMethods.SetupPackMethods();
-                SetupDone = true;
-            }
 
-            Type needType = typeof(T);
+            lock (LockObject)
+            {//Потокобезопасность - если из разных потоков попытаются сгенерить упаковщик
+                if (!SetupDone)
+                {
+                    PackMethods.SetupPackMethods();
+                    SetupDone = true;
+                }
 
-            //searches for a method implementation for this type or tries to generate
-            if (PackMethods.PackMethodsDictionary.TryGetValue(needType, out IPackagerMethodGeneric ipm))
-            {
-                return (IPackagerMethod<T>)ipm;
-            }
-            //поиск среди закэшеированных созданных универсальных типов из PackMethods.PackGenericNoCreatedMethodsDictionary
-            else if (Automatic.GenericFactoryExtension.Cache.TryGetValue(needType, out var type))
-            {
-                return (IPackagerMethod<T>)type;
-            }
-            //поиск среди найденных универсальных типов
-            else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(needType.GetFullName(), out var genType))
-            {
-                return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(genType);
-            }
-            else if (needType.IsUnManaged())
-            {
-                //создаёт новый упаковщик неуправляймого типа
-                return (IPackagerMethod<T>)Automatic.PackUnmanagedAutomaticExtension.Make<T>();
-            }
-            else
-            {
-                //создаёт новый упаковщик управляймого типа
-                return (IPackagerMethod<T>)Automatic.PackManagedAutomaticExtension.Make<T>();
+                Type needType = typeof(T);
+
+                //searches for a method implementation for this type or tries to generate
+                if (PackMethods.PackMethodsDictionary.TryGetValue(needType, out IPackagerMethodGeneric ipm))
+                {
+                    return (IPackagerMethod<T>)ipm;
+                }
+                //поиск среди закэшеированных созданных универсальных типов из PackMethods.PackGenericNoCreatedMethodsDictionary
+                else if (Automatic.GenericFactoryExtension.Cache.TryGetValue(needType, out var type))
+                {
+                    return (IPackagerMethod<T>)type;
+                }
+                //поиск среди найденных универсальных типов
+                else if (PackMethods.PackGenericNoCreatedMethodsDictionary.TryGetValue(needType.GetFullName(), out var genType))
+                {
+                    return (IPackagerMethod<T>)Automatic.GenericFactoryExtension.Make<T>(genType);
+                }
+                else if (needType.IsUnManaged())
+                {
+                    //создаёт новый упаковщик неуправляймого типа
+                    return (IPackagerMethod<T>)Automatic.PackUnmanagedAutomaticExtension.Make<T>();
+                }
+                else
+                {
+                    //создаёт новый упаковщик управляймого типа
+                    return (IPackagerMethod<T>)Automatic.PackManagedAutomaticExtension.Make<T>();
+                }
             }
         }
 
@@ -65,7 +67,7 @@ namespace SmartPackager
         /// <returns></returns>
         public static bool IsFixedType<T>()
         {
-            return GetMethods<T>().IsFixedSize;
+            return GetMethod<T>().IsFixedSize;
         }
         #endregion
 
@@ -76,7 +78,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1> Create<T1>()
         {
-            return new M<T1>(GetMethods<T1>());
+            return new M<T1>(GetMethod<T1>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -84,7 +86,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2> Create<T1, T2>()
         {
-            return new M<T1, T2>(GetMethods<T1>(), GetMethods<T2>());
+            return new M<T1, T2>(GetMethod<T1>(), GetMethod<T2>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -92,7 +94,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3> Create<T1, T2, T3>()
         {
-            return new M<T1, T2, T3>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>());
+            return new M<T1, T2, T3>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -100,7 +102,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4> Create<T1, T2, T3, T4>()
         {
-            return new M<T1, T2, T3, T4>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>());
+            return new M<T1, T2, T3, T4>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -108,7 +110,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5> Create<T1, T2, T3, T4, T5>()
         {
-            return new M<T1, T2, T3, T4, T5>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>());
+            return new M<T1, T2, T3, T4, T5>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -116,7 +118,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6> Create<T1, T2, T3, T4, T5, T6>()
         {
-            return new M<T1, T2, T3, T4, T5, T6>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>());
+            return new M<T1, T2, T3, T4, T5, T6>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -124,7 +126,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7> Create<T1, T2, T3, T4, T5, T6, T7>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>());
+            return new M<T1, T2, T3, T4, T5, T6, T7>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -132,7 +134,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8> Create<T1, T2, T3, T4, T5, T6, T7, T8>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -140,7 +142,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -148,7 +150,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -156,7 +158,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -164,7 +166,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -172,7 +174,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -180,7 +182,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -188,7 +190,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -196,7 +198,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -204,7 +206,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>(), GetMethods<T17>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -212,7 +214,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>(), GetMethods<T17>(), GetMethods<T18>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>(), GetMethod<T18>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -220,7 +222,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>(), GetMethods<T17>(), GetMethods<T18>(), GetMethods<T19>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>(), GetMethod<T18>(), GetMethod<T19>());
         }
         /// <summary>
         /// Creates a packer for the selected set of types
@@ -228,7 +230,7 @@ namespace SmartPackager
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>()
         {
-            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(GetMethods<T1>(), GetMethods<T2>(), GetMethods<T3>(), GetMethods<T4>(), GetMethods<T5>(), GetMethods<T6>(), GetMethods<T7>(), GetMethods<T8>(), GetMethods<T9>(), GetMethods<T10>(), GetMethods<T11>(), GetMethods<T12>(), GetMethods<T13>(), GetMethods<T14>(), GetMethods<T15>(), GetMethods<T16>(), GetMethods<T17>(), GetMethods<T18>(), GetMethods<T19>(), GetMethods<T20>());
+            return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>(), GetMethod<T18>(), GetMethod<T19>(), GetMethod<T20>());
         }
 
         #endregion
@@ -285,7 +287,7 @@ namespace SmartPackager
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1)
+            public void UnPack(byte[] source, int offset, out T1 t1)
             {
                 T1 t1_ = default;
                 UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
@@ -319,34 +321,24 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                return meter.GetCalcLength();
             }
-            /// <summary>
-            /// Packs data into an array
-            /// </summary>
-            public unsafe int PackUP(byte* destination, T1 t1, T2 t2)
-            {
-                int size = 0;
-                int offset;
-
-                offset = Ipm1.PackUP(destination, t1);
-                destination += offset;
-                size += offset;
-                size += Ipm2.PackUP(destination, t2);
-                return size;
-            }
+           
+            
             /// <summary>
             /// Packs data into an array
             /// </summary>
             public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    Ipm2.PackUP(point, t2);
-                }
+                    StackWriter writer = new StackWriter(array);
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -356,25 +348,14 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    Ipm2.PackUP(point, t2);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
                 }
                 return destination;
             }
-            /// <summary>
-            /// Unpacks data from an array
-            /// </summary>
-            public unsafe int UnPack(byte* source, out T1 t1, out T2 t2)
-            {
-                int size = 0;
-                int offset;
-                offset = Ipm1.UnPack(source, out t1);
-                size += offset;
-                source += offset;
-                size += Ipm2.UnPack(source, out t2);
-                return size;
-            }
+       
+            
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
@@ -382,9 +363,9 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    Ipm2.UnPack(point, out t2);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
                 }
             }
         }
@@ -414,9 +395,11 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -425,10 +408,10 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    Ipm3.PackUP(point, t3);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
                 }
             }
             /// <summary>
@@ -439,10 +422,10 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    Ipm3.PackUP(point, t3);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
                 }
                 return destination;
             }
@@ -453,10 +436,10 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    Ipm3.UnPack(point, out t3);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
                 }
             }
         }
@@ -489,10 +472,12 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -501,11 +486,11 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    Ipm4.PackUP(point, t4);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
                 }
             }
             /// <summary>
@@ -516,11 +501,11 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    Ipm4.PackUP(point, t4);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
                 }
                 return destination;
             }
@@ -531,11 +516,11 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    Ipm4.UnPack(point, out t4);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
                 }
             }
         }
@@ -571,11 +556,13 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -584,12 +571,12 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    Ipm5.PackUP(point, t5);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
                 }
             }
             /// <summary>
@@ -600,12 +587,12 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    Ipm5.PackUP(point, t5);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
                 }
                 return destination;
             }
@@ -616,12 +603,12 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    Ipm5.UnPack(point, out t5);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
                 }
             }
         }
@@ -660,12 +647,14 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -674,13 +663,13 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    Ipm6.PackUP(point, t6);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
                 }
             }
             /// <summary>
@@ -691,13 +680,13 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    Ipm6.PackUP(point, t6);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
                 }
                 return destination;
             }
@@ -708,13 +697,13 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    Ipm6.UnPack(point, out t6);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
                 }
             }
         }
@@ -756,13 +745,15 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -771,14 +762,14 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    Ipm7.PackUP(point, t7);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
                 }
             }
             /// <summary>
@@ -789,14 +780,14 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    Ipm7.PackUP(point, t7);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
                 }
                 return destination;
             }
@@ -807,14 +798,14 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    Ipm7.UnPack(point, out t7);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
                 }
             }
         }
@@ -859,14 +850,16 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -875,15 +868,15 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    Ipm8.PackUP(point, t8);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
                 }
             }
             /// <summary>
@@ -894,15 +887,15 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    Ipm8.PackUP(point, t8);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
                 }
                 return destination;
             }
@@ -913,15 +906,15 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    Ipm8.UnPack(point, out t8);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
                 }
             }
         }
@@ -969,15 +962,17 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -987,15 +982,16 @@ namespace SmartPackager
                 fixed (byte* dest = &destination[offset])
                 {
                     byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
                 }
             }
             /// <summary>
@@ -1006,16 +1002,16 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
                 }
                 return destination;
             }
@@ -1026,16 +1022,16 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
                 }
             }
         }
@@ -1086,16 +1082,18 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1104,17 +1102,17 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    Ipm10.PackUP(point, t10);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
                 }
             }
             /// <summary>
@@ -1125,17 +1123,17 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    Ipm10.PackUP(point, t10);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
                 }
                 return destination;
             }
@@ -1146,17 +1144,17 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    Ipm10.UnPack(point, out t10);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
                 }
             }
         }
@@ -1210,17 +1208,19 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1229,18 +1229,18 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    Ipm11.PackUP(point, t11);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
                 }
             }
             /// <summary>
@@ -1251,18 +1251,18 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    Ipm11.PackUP(point, t11);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
                 }
                 return destination;
             }
@@ -1273,18 +1273,18 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    Ipm11.UnPack(point, out t11);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
                 }
             }
         }
@@ -1341,18 +1341,20 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1361,19 +1363,19 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    Ipm12.PackUP(point, t12);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
                 }
             }
             /// <summary>
@@ -1384,19 +1386,19 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    Ipm12.PackUP(point, t12);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
                 }
                 return destination;
             }
@@ -1407,19 +1409,19 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    Ipm12.UnPack(point, out t12);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
                 }
             }
         }
@@ -1479,19 +1481,21 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1500,20 +1504,20 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    Ipm13.PackUP(point, t13);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
                 }
             }
             /// <summary>
@@ -1524,20 +1528,20 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    Ipm13.PackUP(point, t13);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
                 }
                 return destination;
             }
@@ -1548,20 +1552,20 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    Ipm13.UnPack(point, out t13);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
                 }
             }
         }
@@ -1624,20 +1628,22 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1646,21 +1652,21 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    Ipm14.PackUP(point, t14);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
                 }
             }
             /// <summary>
@@ -1671,21 +1677,21 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    Ipm14.PackUP(point, t14);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
                 }
                 return destination;
             }
@@ -1696,21 +1702,21 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    Ipm14.UnPack(point, out t14);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
                 }
             }
         }
@@ -1776,21 +1782,23 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14) +
-                       Ipm15.GetSize(t15);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                Ipm15.GetSize(ref meter, t15);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1799,22 +1807,8 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    Ipm15.PackUP(point, t15);
+
+
                 }
             }
             /// <summary>
@@ -1825,22 +1819,22 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    Ipm15.PackUP(point, t15);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
                 }
                 return destination;
             }
@@ -1851,22 +1845,22 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    point += Ipm14.UnPack(point, out t14);
-                    Ipm15.UnPack(point, out t15);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
+                    Ipm15.UnPack(ref reader, out t15);
                 }
             }
         }
@@ -1935,22 +1929,24 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14) +
-                       Ipm15.GetSize(t15) +
-                       Ipm16.GetSize(t16);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                Ipm15.GetSize(ref meter, t15);
+                Ipm16.GetSize(ref meter, t16);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -1959,23 +1955,23 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    Ipm16.PackUP(point, t16);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
                 }
             }
             /// <summary>
@@ -1986,23 +1982,23 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    Ipm16.PackUP(point, t16);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
                 }
                 return destination;
             }
@@ -2013,23 +2009,23 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    point += Ipm14.UnPack(point, out t14);
-                    point += Ipm15.UnPack(point, out t15);
-                    Ipm16.UnPack(point, out t16);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
+                    Ipm15.UnPack(ref reader, out t15);
+                    Ipm16.UnPack(ref reader, out t16);
                 }
             }
         }
@@ -2101,23 +2097,25 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14) +
-                       Ipm15.GetSize(t15) +
-                       Ipm16.GetSize(t16) +
-                       Ipm17.GetSize(t17);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                Ipm15.GetSize(ref meter, t15);
+                Ipm16.GetSize(ref meter, t16);
+                Ipm17.GetSize(ref meter, t17);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -2126,24 +2124,25 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    Ipm17.PackUP(point, t17);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+ 
                 }
             }
             /// <summary>
@@ -2154,24 +2153,24 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    Ipm17.PackUP(point, t17);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
                 }
                 return destination;
             }
@@ -2182,24 +2181,24 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    point += Ipm14.UnPack(point, out t14);
-                    point += Ipm15.UnPack(point, out t15);
-                    point += Ipm16.UnPack(point, out t16);
-                    Ipm17.UnPack(point, out t17);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
+                    Ipm15.UnPack(ref reader, out t15);
+                    Ipm16.UnPack(ref reader, out t16);
+                    Ipm17.UnPack(ref reader, out t17);
                 }
             }
         }
@@ -2274,24 +2273,27 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14) +
-                       Ipm15.GetSize(t15) +
-                       Ipm16.GetSize(t16) +
-                       Ipm17.GetSize(t17) +
-                       Ipm18.GetSize(t18);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                Ipm15.GetSize(ref meter, t15);
+                Ipm16.GetSize(ref meter, t16);
+                Ipm17.GetSize(ref meter, t17);
+                Ipm18.GetSize(ref meter, t18);
+               return meter.GetCalcLength();
+
             }
             /// <summary>
             /// Packs data into an array
@@ -2300,25 +2302,25 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    point += Ipm17.PackUP(point, t17);
-                    Ipm18.PackUP(point, t18);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+                    Ipm18.PackUP(ref writer, t18);
                 }
             }
             /// <summary>
@@ -2329,25 +2331,25 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    point += Ipm17.PackUP(point, t17);
-                    Ipm18.PackUP(point, t18);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+                    Ipm18.PackUP(ref writer, t18);
                 }
                 return destination;
             }
@@ -2358,25 +2360,25 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    point += Ipm14.UnPack(point, out t14);
-                    point += Ipm15.UnPack(point, out t15);
-                    point += Ipm16.UnPack(point, out t16);
-                    point += Ipm17.UnPack(point, out t17);
-                    Ipm18.UnPack(point, out t18);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
+                    Ipm15.UnPack(ref reader, out t15);
+                    Ipm16.UnPack(ref reader, out t16);
+                    Ipm17.UnPack(ref reader, out t17);
+                    Ipm18.UnPack(ref reader, out t18);
                 }
             }
         }
@@ -2454,25 +2456,27 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14) +
-                       Ipm15.GetSize(t15) +
-                       Ipm16.GetSize(t16) +
-                       Ipm17.GetSize(t17) +
-                       Ipm18.GetSize(t18) +
-                       Ipm19.GetSize(t19);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                Ipm15.GetSize(ref meter, t15);
+                Ipm16.GetSize(ref meter, t16);
+                Ipm17.GetSize(ref meter, t17);
+                Ipm18.GetSize(ref meter, t18);
+                Ipm19.GetSize(ref meter, t19);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -2481,27 +2485,26 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    point += Ipm17.PackUP(point, t17);
-                    point += Ipm18.PackUP(point, t18);
-                    Ipm19.PackUP(point, t19);
-
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+                    Ipm18.PackUP(ref writer, t18);
+                    Ipm19.PackUP(ref writer, t19);
                 }
             }
             /// <summary>
@@ -2512,26 +2515,26 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    point += Ipm17.PackUP(point, t17);
-                    point += Ipm18.PackUP(point, t18);
-                    Ipm19.PackUP(point, t19);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+                    Ipm18.PackUP(ref writer, t18);
+                    Ipm19.PackUP(ref writer, t19);
                 }
                 return destination;
             }
@@ -2542,26 +2545,26 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    point += Ipm14.UnPack(point, out t14);
-                    point += Ipm15.UnPack(point, out t15);
-                    point += Ipm16.UnPack(point, out t16);
-                    point += Ipm17.UnPack(point, out t17);
-                    point += Ipm18.UnPack(point, out t18);
-                    Ipm19.UnPack(point, out t19);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
+                    Ipm15.UnPack(ref reader, out t15);
+                    Ipm16.UnPack(ref reader, out t16);
+                    Ipm17.UnPack(ref reader, out t17);
+                    Ipm18.UnPack(ref reader, out t18);
+                    Ipm19.UnPack(ref reader, out t19);
                 }
             }
         }
@@ -2642,26 +2645,28 @@ namespace SmartPackager
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
-                return Ipm1.GetSize(t1) +
-                       Ipm2.GetSize(t2) +
-                       Ipm3.GetSize(t3) +
-                       Ipm4.GetSize(t4) +
-                       Ipm5.GetSize(t5) +
-                       Ipm6.GetSize(t6) +
-                       Ipm7.GetSize(t7) +
-                       Ipm8.GetSize(t8) +
-                       Ipm9.GetSize(t9) +
-                       Ipm10.GetSize(t10) +
-                       Ipm11.GetSize(t11) +
-                       Ipm12.GetSize(t12) +
-                       Ipm13.GetSize(t13) +
-                       Ipm14.GetSize(t14) +
-                       Ipm15.GetSize(t15) +
-                       Ipm16.GetSize(t16) +
-                       Ipm17.GetSize(t17) +
-                       Ipm18.GetSize(t18) +
-                       Ipm19.GetSize(t19) +
-                       Ipm20.GetSize(t20);
+                StackMeter meter = new StackMeter();
+                Ipm1.GetSize(ref meter, t1);
+                Ipm2.GetSize(ref meter, t2);
+                Ipm3.GetSize(ref meter, t3);
+                Ipm4.GetSize(ref meter, t4);
+                Ipm5.GetSize(ref meter, t5);
+                Ipm6.GetSize(ref meter, t6);
+                Ipm7.GetSize(ref meter, t7);
+                Ipm8.GetSize(ref meter, t8);
+                Ipm9.GetSize(ref meter, t9);
+                Ipm10.GetSize(ref meter, t10);
+                Ipm11.GetSize(ref meter, t11);
+                Ipm12.GetSize(ref meter, t12);
+                Ipm13.GetSize(ref meter, t13);
+                Ipm14.GetSize(ref meter, t14);
+                Ipm15.GetSize(ref meter, t15);
+                Ipm16.GetSize(ref meter, t16);
+                Ipm17.GetSize(ref meter, t17);
+                Ipm18.GetSize(ref meter, t18);
+                Ipm19.GetSize(ref meter, t19);
+                Ipm20.GetSize(ref meter, t20);
+                return meter.GetCalcLength();
             }
             /// <summary>
             /// Packs data into an array
@@ -2670,27 +2675,27 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &destination[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    point += Ipm17.PackUP(point, t17);
-                    point += Ipm18.PackUP(point, t18);
-                    point += Ipm19.PackUP(point, t19);
-                    Ipm20.PackUP(point, t20);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+                    Ipm18.PackUP(ref writer, t18);
+                    Ipm19.PackUP(ref writer, t19);
+                    Ipm20.PackUP(ref writer, t20);
 
                 }
             }
@@ -2702,27 +2707,27 @@ namespace SmartPackager
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)];
                 fixed (byte* dest = &destination[0])
                 {
-                    byte* point = dest;
-                    point += Ipm1.PackUP(point, t1);
-                    point += Ipm2.PackUP(point, t2);
-                    point += Ipm3.PackUP(point, t3);
-                    point += Ipm4.PackUP(point, t4);
-                    point += Ipm5.PackUP(point, t5);
-                    point += Ipm6.PackUP(point, t6);
-                    point += Ipm7.PackUP(point, t7);
-                    point += Ipm8.PackUP(point, t8);
-                    point += Ipm9.PackUP(point, t9);
-                    point += Ipm10.PackUP(point, t10);
-                    point += Ipm11.PackUP(point, t11);
-                    point += Ipm12.PackUP(point, t12);
-                    point += Ipm13.PackUP(point, t13);
-                    point += Ipm14.PackUP(point, t14);
-                    point += Ipm15.PackUP(point, t15);
-                    point += Ipm16.PackUP(point, t16);
-                    point += Ipm17.PackUP(point, t17);
-                    point += Ipm18.PackUP(point, t18);
-                    point += Ipm19.PackUP(point, t19);
-                    Ipm20.PackUP(point, t20);
+                    StackWriter writer = new StackWriter();
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                    Ipm16.PackUP(ref writer, t16);
+                    Ipm17.PackUP(ref writer, t17);
+                    Ipm18.PackUP(ref writer, t18);
+                    Ipm19.PackUP(ref writer, t19);
+                    Ipm20.PackUP(ref writer, t20);
                 }
                 return destination;
             }
@@ -2733,27 +2738,27 @@ namespace SmartPackager
             {
                 fixed (byte* dest = &source[offset])
                 {
-                    byte* point = dest;
-                    point += Ipm1.UnPack(point, out t1);
-                    point += Ipm2.UnPack(point, out t2);
-                    point += Ipm3.UnPack(point, out t3);
-                    point += Ipm4.UnPack(point, out t4);
-                    point += Ipm5.UnPack(point, out t5);
-                    point += Ipm6.UnPack(point, out t6);
-                    point += Ipm7.UnPack(point, out t7);
-                    point += Ipm8.UnPack(point, out t8);
-                    point += Ipm9.UnPack(point, out t9);
-                    point += Ipm10.UnPack(point, out t10);
-                    point += Ipm11.UnPack(point, out t11);
-                    point += Ipm12.UnPack(point, out t12);
-                    point += Ipm13.UnPack(point, out t13);
-                    point += Ipm14.UnPack(point, out t14);
-                    point += Ipm15.UnPack(point, out t15);
-                    point += Ipm16.UnPack(point, out t16);
-                    point += Ipm17.UnPack(point, out t17);
-                    point += Ipm18.UnPack(point, out t18);
-                    point += Ipm19.UnPack(point, out t19);
-                    Ipm20.UnPack(point, out t20);
+                    StackReader reader = new StackReader();
+                    Ipm1.UnPack(ref reader, out t1);
+                    Ipm2.UnPack(ref reader, out t2);
+                    Ipm3.UnPack(ref reader, out t3);
+                    Ipm4.UnPack(ref reader, out t4);
+                    Ipm5.UnPack(ref reader, out t5);
+                    Ipm6.UnPack(ref reader, out t6);
+                    Ipm7.UnPack(ref reader, out t7);
+                    Ipm8.UnPack(ref reader, out t8);
+                    Ipm9.UnPack(ref reader, out t9);
+                    Ipm10.UnPack(ref reader, out t10);
+                    Ipm11.UnPack(ref reader, out t11);
+                    Ipm12.UnPack(ref reader, out t12);
+                    Ipm13.UnPack(ref reader, out t13);
+                    Ipm14.UnPack(ref reader, out t14);
+                    Ipm15.UnPack(ref reader, out t15);
+                    Ipm16.UnPack(ref reader, out t16);
+                    Ipm17.UnPack(ref reader, out t17);
+                    Ipm18.UnPack(ref reader, out t18);
+                    Ipm19.UnPack(ref reader, out t19);
+                    Ipm20.UnPack(ref reader, out t20);
                 }
             }
         }

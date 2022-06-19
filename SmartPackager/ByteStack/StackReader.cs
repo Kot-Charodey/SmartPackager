@@ -29,7 +29,7 @@ namespace SmartPackager.ByteStack
         }
 
         private readonly UnsafeArray UnsafeArray;
-        private readonly RefArray RefArray;
+        private RefArray RefArray;
         /// <summary>
         /// Статус потока (ожидаймая следуйщая инструкция)
         /// </summary>
@@ -49,9 +49,7 @@ namespace SmartPackager.ByteStack
         private void CheckState(StreamState state)
         {
             if (State != state)
-            {
                 throw new Exception("Ожидалась другая инструкция!");
-            }
         }
 
         /// <summary>
@@ -77,7 +75,7 @@ namespace SmartPackager.ByteStack
         {
             CheckState(StreamState.Default);
             var data = UnsafeArray.Get<T>(Pos, length);
-            Pos += sizeof(T);
+            Pos += sizeof(T)*length;
             return data;
         }
 
@@ -101,7 +99,7 @@ namespace SmartPackager.ByteStack
         {
             CheckState(StreamState.Default);
             int pos = UnsafeArray.Get<int>(Pos);
-            Pos += sizeof(bool);
+            Pos += sizeof(int);
             if (pos == RefPoint.NULL)
             {
                 State = StreamState.WaitGetObject;
@@ -111,7 +109,7 @@ namespace SmartPackager.ByteStack
             else if(pos == RefPoint.DATA)
             {
                 State = StreamState.WaitAttach;
-                Point_ = new RefPoint(pos, null);
+                Point_ = new RefPoint(Pos, null);
                 return false;
             }
             else
@@ -131,7 +129,7 @@ namespace SmartPackager.ByteStack
             CheckState(StreamState.WaitAttach);
             State = StreamState.Default;
             Point_.Data = val;
-            RefArray.AddRef(Point_);
+            RefArray = RefArray.AddRef(RefArray, Point_);
         }
 
         /// <summary>

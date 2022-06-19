@@ -6,7 +6,7 @@
     public struct StackMeter
     {
         private int Length;
-        private readonly RefArray RefArray;
+        private RefArray RefArray;
 
         /// <summary>
         /// Получить расчитанный размер
@@ -62,13 +62,13 @@
             }
             else
             {
-                if (RefArray.Exists(val, out var point))
+                if (RefArray.Exists(val, out _))
                 {
                     return false;
                 }
                 else
                 {
-                    RefArray.AddRef(new RefPoint(Length, val));
+                    RefArray = RefArray.AddRef(RefArray,new RefPoint(Length, val));
                     return true;
                 }
             }

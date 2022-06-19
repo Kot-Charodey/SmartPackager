@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 #endif
 namespace SmartPackager.ByteStack
 {
-    
+
     /// <see cref="UnsafeArray"/>
     internal delegate void UnsafeArrayAction(ref UnsafeArray array);
 
@@ -101,7 +101,7 @@ namespace SmartPackager.ByteStack
             TrowUse();
             ThrowLength(offset + sizeof(T));
 
-            return *((T*)Buffer + offset);
+            return *((T*)(Buffer + offset));
         }
 
         /// <summary>
@@ -117,7 +117,9 @@ namespace SmartPackager.ByteStack
             TrowUse();
             ThrowLength(offset + sizeof(T));
 
-            *((T*)Buffer + offset) = val;
+            var ptr = Buffer + offset;
+
+            *((T*)(Buffer + offset)) = val;
         }
 
         /// <summary>
@@ -138,7 +140,7 @@ namespace SmartPackager.ByteStack
             {
                 fixed (void* arr_ptr = array)
                 {
-                    System.Buffer.MemoryCopy(arr_ptr, Buffer, len, len);
+                    System.Buffer.MemoryCopy(arr_ptr, Buffer + offset, len, len);
                 }
             }
         }
@@ -161,7 +163,7 @@ namespace SmartPackager.ByteStack
             T[] array = new T[size];
             fixed (void* arr_ptr = array)
             {
-                System.Buffer.MemoryCopy(Buffer, arr_ptr, len, len);
+                System.Buffer.MemoryCopy(Buffer + offset, arr_ptr, len, len);
             }
             return array;
         }

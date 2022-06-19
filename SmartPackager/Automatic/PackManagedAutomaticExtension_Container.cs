@@ -233,7 +233,7 @@ namespace SmartPackager.Automatic
                 }
                 else
                 {
-                    method = Packager.GetMethods<TField>();
+                    method = Packager.GetMethod<TField>();
                 }
                 bool fixedSize = method.IsFixedSize;
 

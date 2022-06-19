@@ -24,6 +24,32 @@ namespace UTestSmartPackager
         }
 
         [TestMethod]
+        public void TestPackager_Ms()
+        {
+            SmartPackager.Packager.Create<int>().PackUP(1);
+            SmartPackager.Packager.Create<int, int>().PackUP(1, 2);
+            SmartPackager.Packager.Create<int, int, int>().PackUP(1, 2, 3);
+            SmartPackager.Packager.Create<int, int, int, int>().PackUP(1, 2, 3, 4);
+            SmartPackager.Packager.Create<int, int, int, int, int>().PackUP(1, 2, 3, 4, 5);
+            SmartPackager.Packager.Create<int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
+            SmartPackager.Packager.Create<int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int>().PackUP(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+            Assert.IsTrue(true);
+        }
+
+        [TestMethod]
         public void TestPackager_Numeric()
         {
             Assert.AreEqual(byte.MinValue,
@@ -116,39 +142,99 @@ namespace UTestSmartPackager
         }
 
         [TestMethod]
+        public void TestPackager_ArrayFixedSize()
+        {
+            {
+                var packager = SmartPackager.Packager.Create<int[]>();
+                Assert.AreEqual(packager.CalcNeedSize(null), 4);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<int[]>();
+                Assert.AreEqual(packager.CalcNeedSize(new int[0]), 8);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<int[]>();
+                Assert.AreEqual(packager.CalcNeedSize(new int[1]), 12);
+            }
+        }
+
+
+        [TestMethod]
+        public void TestPackager_ArrayDynSize()
+        {
+            //4 ref   array
+            //4 size  size array
+            //4 ref   class
+            //8 data  class
+            {
+                var packager = SmartPackager.Packager.Create<TestClassData[]>();
+                Assert.AreEqual(packager.CalcNeedSize(null), 4);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<TestClassData[]>();
+                Assert.AreEqual(packager.CalcNeedSize(new TestClassData[0]), 8);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<TestClassData[]>();
+                Assert.AreEqual(packager.CalcNeedSize(new TestClassData[1]), 12);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<TestClassData[]>();
+                Assert.AreEqual(packager.CalcNeedSize(new TestClassData[1] { new TestClassData() }), 20);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<TestClassData[]>();
+                var cl = new TestClassData();
+                Assert.AreEqual(packager.CalcNeedSize(new TestClassData[2] { cl, cl }), 24);
+            }
+
+            {
+                var packager = SmartPackager.Packager.Create<TestClassData[]>();
+                Assert.AreEqual(packager.CalcNeedSize(new TestClassData[2] { new TestClassData(), new TestClassData() }), 32);
+            }
+        }
+
+        [TestMethod]
         public void TestPackager_ArrayFixed()
         {
             {
                 int[] Arr = null;
-                Assert.AreEqual(Arr,
-                   TestPackager(Arr));
+                var unArr = TestPackager(Arr);
+                CollectionAssert.AreEqual(Arr, unArr);
             }
             {
                 int[] Arr = new int[0];
-                CollectionAssert.AreEqual(Arr,
-                   TestPackager(Arr));
+                var unArr = TestPackager(Arr);
+                CollectionAssert.AreEqual(Arr, unArr);
             }
             {
                 int[] Arr = new int[1];
-                CollectionAssert.AreEqual(Arr,
-                   TestPackager(Arr));
+                var unArr = TestPackager(Arr);
+                CollectionAssert.AreEqual(Arr,unArr);
             }
             {
                 byte[] Arr = new byte[ushort.MaxValue];
-                CollectionAssert.AreEqual(Arr,
-                   TestPackager(Arr));
+                var unArr = TestPackager(Arr);
+                CollectionAssert.AreEqual(Arr, unArr);
             }
             {
                 int[] Arr = new int[] { R.Next() };
-                CollectionAssert.AreEqual(Arr,
-                   TestPackager(Arr));
+                var unArr = TestPackager(Arr);
+                CollectionAssert.AreEqual(Arr, unArr);
             }
             {
                 int[] Arr = new int[1024];
                 for (int i = 0; i < Arr.Length; i++)
                     Arr[i] = R.Next();
-                CollectionAssert.AreEqual(Arr,
-                   TestPackager(Arr));
+
+                var unArr = TestPackager(Arr);
+                CollectionAssert.AreEqual(Arr, unArr);
             }
         }
 
@@ -236,8 +322,8 @@ namespace UTestSmartPackager
             SmartPackager.Collections.Generic.Dll.Plug(false);
 
             var pack = SmartPackager.Packager.Create<Dictionary<string, int>>();
-            Assert.AreEqual(pack.CalcNeedSize(null), 1);
-            Assert.IsTrue(pack.CalcNeedSize(new Dictionary<string, int>()) > 1);
+            Assert.AreEqual(pack.CalcNeedSize(null), 4);
+            Assert.IsTrue(pack.CalcNeedSize(new Dictionary<string, int>()) > 4);
 
             pack.UnPack(pack.PackUP(null), 0, out var testD0);
             Assert.IsNull(testD0);
@@ -323,9 +409,9 @@ namespace UTestSmartPackager
             var t = TestPackager(classC);
             Assert.AreEqual(t.a, classC.a);
             Assert.AreEqual(t.b, classC.b);
-            Assert.AreEqual(SmartPackager.Packager.Create<ClassC>().CalcNeedSize(null), 1);
-            Assert.AreEqual(SmartPackager.Packager.Create<ClassC>().CalcNeedSize(new ClassC()), sizeof(byte) + sizeof(int) + sizeof(int));
-            Assert.IsTrue(SmartPackager.Packager.IsFixedType<ClassC>());
+            Assert.AreEqual(SmartPackager.Packager.Create<ClassC>().CalcNeedSize(null), 4);
+            Assert.AreEqual(SmartPackager.Packager.Create<ClassC>().CalcNeedSize(new ClassC()), sizeof(int) + sizeof(int) + sizeof(int));
+            Assert.IsFalse(SmartPackager.Packager.IsFixedType<ClassC>());
         }
 
         [TestMethod]

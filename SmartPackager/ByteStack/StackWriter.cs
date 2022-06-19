@@ -12,7 +12,7 @@ namespace SmartPackager.ByteStack
     public struct StackWriter
     {
         private readonly UnsafeArray UnsafeArray;
-        private readonly RefArray RefArray;
+        private RefArray RefArray;
         private int Pos;
 
         internal StackWriter(UnsafeArray unsafeArray)
@@ -78,7 +78,7 @@ namespace SmartPackager.ByteStack
                 {
                     UnsafeArray.Set(Pos, RefPoint.DATA);
                     Pos += sizeof(int);
-                    RefArray.AddRef(new RefPoint(Pos, val));
+                    RefArray = RefArray.AddRef(RefArray, new RefPoint(Pos, val));
                     return true;
                 }
             }

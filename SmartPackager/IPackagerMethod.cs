@@ -5,7 +5,7 @@
     /// Defines the unpacking and packing methods for the selected type
     /// </summary>
     /// <typeparam name="T">target type</typeparam>
-    public unsafe interface IPackagerMethod<T> : IPackagerMethodGeneric
+    public interface IPackagerMethod<T> : IPackagerMethodGeneric
     {
         /// <summary>
         /// Packs data into a buffer

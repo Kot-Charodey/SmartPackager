@@ -15,12 +15,13 @@ namespace SmartPackager.ByteStack
     {
         private List<RefPoint> List;
 
-        public void AddRef(RefPoint point)
+        public static RefArray AddRef(RefArray array, RefPoint point)
         {
-            if (List == null)
-                List = new List<RefPoint>(25);
+            if (array.List == null)
+                array.List = new List<RefPoint>(25);
 
-            List.Add(point);
+            array.List.Add(point);
+            return array;
         }
 
         public bool Exists(object val,out RefPoint point)
@@ -46,6 +47,8 @@ namespace SmartPackager.ByteStack
 
         public object GetObject(int pos)
         {
+            if (List == null)
+                return null;
             for(int i = 0; i < List.Count; i++)
             {
                 if (List[i].Point == pos)

@@ -26,7 +26,7 @@ namespace SmartPackager.Automatic
 
         private static void PackArray<TArray, TElement>(PackManagedAutomatic<TArray> pma)
         {
-            IPackagerMethod<TElement> pack = Packager.GetMethods<TElement>();
+            IPackagerMethod<TElement> pack = Packager.GetMethod<TElement>();
 
             if (typeof(TArray).GetArrayRank() == 1)
             {
@@ -61,10 +61,11 @@ namespace SmartPackager.Automatic
                     }
                     else
                     {
-                        int arrLen = reader.ReadLength();
                         destination = null;
-                        unPack(ref reader, ref destination);
                         reader.AttachReference(destination);
+                        int arrLen = reader.ReadLength();
+                        destination = new TElement[arrLen];
+                        unPack(ref reader, ref destination);
                     }
                 }
 
@@ -80,9 +81,10 @@ namespace SmartPackager.Automatic
                     }
                     else
                     {
+                        destination = null;
+                        reader.AttachReference(destination);
                         int arrLen = reader.ReadLength();
                         destination = new TElement[arrLen];
-                        reader.AttachReference(destination);
                         unPack(ref reader, ref destination);
                     }
                 }

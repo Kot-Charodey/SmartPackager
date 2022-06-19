@@ -1,59 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartPackager.Collections.Generic
 {
     using SmartPackager;
+    using SmartPackager.ByteStack;
 
     public class PackDictionary<Key, Value> : IPackagerMethod<Dictionary<Key, Value>>
     {
-        private static Packager.M<Key[], Value[]> PackBase = Packager.Create<Key[], Value[]>();
+        private static readonly IPackagerMethod<(Key, Value)[]> PackBase = Packager.GetMethod<(Key, Value)[]>();
 
         public Type TargetType => typeof(Dictionary<Key, Value>);
 
         public bool IsFixedSize => false;
 
-        public int GetSize(Dictionary<Key, Value> source)
+        public void GetSize(ref StackMeter meter, Dictionary<Key, Value> source)
         {
-            if (source == null)
-                return 1;
-            return PackBase.CalcNeedSize(source.Keys.ToArray(), source.Values.ToArray()) + 1;
+            (Key, Value)[] data = null;
+            if (source != null)
+                data = (from item in source select (item.Key, item.Value)).ToArray();
+            PackBase.GetSize(ref meter, data);
         }
 
-        public unsafe int PackUP(byte* destination, Dictionary<Key, Value> source)
+        public void PackUP(ref StackWriter writer, Dictionary<Key, Value> source)
         {
-            *destination = source == null ? (byte)0 : (byte)1;
-            if (*destination != 0)
-            {
-                destination++;
-                return PackBase.PackUP(destination, source.Keys.ToArray(), source.Values.ToArray());
-            }
-            else
-                return 0;
+            (Key, Value)[] data = null;
+            if (source != null)
+                data = (from item in source select (item.Key, item.Value)).ToArray();
+            PackBase.PackUP(ref writer, data);
+
         }
 
-        public unsafe int UnPack(byte* source, out Dictionary<Key, Value> destination)
+        public void UnPack(ref StackReader reader, out Dictionary<Key, Value> destination)
         {
-            if (*source != 0)
+            PackBase.UnPack(ref reader, out var data);
+            if (data != null)
             {
-                source++;
-                int size = PackBase.UnPack(source, out var key, out var value);
-                destination = new Dictionary<Key, Value>(key.Length);
-                byte[] kk = new byte[1024];
-
-                for (int i = 0; i < key.Length; i++)
-                {
-                    destination.Add(key[i], value[i]);
-                }
-                return size;
+                destination = data.ToDictionary(x => x.Item1, x => x.Item2);
             }
             else
             {
                 destination = null;
-                return 1;
             }
         }
     }
