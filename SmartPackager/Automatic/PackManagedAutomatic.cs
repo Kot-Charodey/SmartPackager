@@ -11,7 +11,7 @@ namespace SmartPackager.Automatic
     /// </summary>
     internal class PackManagedAutomatic<T> : IPackagerMethod<T>
     {
-        public Type TargetType { get; set; }
+        public Type TargetType => typeof(T);
         public bool IsFixedSize { get; set; }
 
         //упаковщики полей

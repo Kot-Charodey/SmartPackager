@@ -11,7 +11,8 @@ namespace SmartPackager
     public static class Packager
     {
         internal static bool SetupDone = false;
-        private readonly static object LockObject = new object();
+
+        private readonly static object _lock = new object();
 
         /// <summary>
         /// Генерирует или ищит метод упаковки (для внутренего использования)
@@ -20,9 +21,8 @@ namespace SmartPackager
         /// <returns>метод упаковки</returns>
         public static IPackagerMethod<T> GetMethod<T>()
         {
-
-            lock (LockObject)
-            {//Потокобезопасность - если из разных потоков попытаются сгенерить упаковщик
+            lock (_lock)//Потокобезопасность - если из разных потоков попытаются сгенерить упаковщик
+            { 
                 if (!SetupDone)
                 {
                     PackMethods.SetupPackMethods();
@@ -326,12 +326,12 @@ namespace SmartPackager
                 Ipm2.GetSize(ref meter, t2);
                 return meter.GetCalcLength();
             }
-           
-            
+
+
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2)
             {
                 UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
@@ -346,27 +346,31 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
-                }
+                });
                 return destination;
             }
-       
-            
+
+
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2)
             {
-                fixed (byte* dest = &source[offset])
+                T1 t1_ = default;
+                T2 t2_ = default;
+                UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                }
+                    StackReader reader = new StackReader(array);
+                    Ipm1.UnPack(ref reader, out t1_);
+                    Ipm2.UnPack(ref reader, out t2_);
+                });
+                t1 = t1_;
+                t2 = t2_;
             }
         }
         #endregion
@@ -404,42 +408,38 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3)
-            {
-                fixed (byte* dest = &destination[offset])
-                {
-                    StackWriter writer = new StackWriter();
-                    Ipm1.PackUP(ref writer, t1);
-                    Ipm2.PackUP(ref writer, t2);
-                    Ipm3.PackUP(ref writer, t3);
-                }
-            }
-            /// <summary>
-            /// Packs data into an array
-            /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3)];
                 fixed (byte* dest = &destination[0])
-                {
-                    StackWriter writer = new StackWriter();
-                    Ipm1.PackUP(ref writer, t1);
-                    Ipm2.PackUP(ref writer, t2);
-                    Ipm3.PackUP(ref writer, t3);
-                }
+                    UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                    {
+                        StackWriter writer = new StackWriter(array);
+                        Ipm1.PackUP(ref writer, t1);
+                        Ipm2.PackUP(ref writer, t2);
+                        Ipm3.PackUP(ref writer, t3);
+                    });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
                 }
             }
         }
@@ -482,16 +482,16 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
                     Ipm4.PackUP(ref writer, t4);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -499,28 +499,38 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
                     Ipm4.PackUP(ref writer, t4);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
                 }
             }
         }
@@ -567,17 +577,17 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
                     Ipm4.PackUP(ref writer, t4);
                     Ipm5.PackUP(ref writer, t5);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -585,30 +595,42 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
                     Ipm4.PackUP(ref writer, t4);
                     Ipm5.PackUP(ref writer, t5);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
                 }
             }
         }
@@ -659,18 +681,18 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
                     Ipm4.PackUP(ref writer, t4);
                     Ipm5.PackUP(ref writer, t5);
                     Ipm6.PackUP(ref writer, t6);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -678,32 +700,46 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
                     Ipm4.PackUP(ref writer, t4);
                     Ipm5.PackUP(ref writer, t5);
                     Ipm6.PackUP(ref writer, t6);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
                 }
             }
         }
@@ -758,11 +794,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -770,7 +806,7 @@ namespace SmartPackager
                     Ipm5.PackUP(ref writer, t5);
                     Ipm6.PackUP(ref writer, t6);
                     Ipm7.PackUP(ref writer, t7);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -778,9 +814,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -788,24 +824,40 @@ namespace SmartPackager
                     Ipm5.PackUP(ref writer, t5);
                     Ipm6.PackUP(ref writer, t6);
                     Ipm7.PackUP(ref writer, t7);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
                 }
             }
         }
@@ -864,11 +916,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -877,7 +929,7 @@ namespace SmartPackager
                     Ipm6.PackUP(ref writer, t6);
                     Ipm7.PackUP(ref writer, t7);
                     Ipm8.PackUP(ref writer, t8);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -885,9 +937,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -896,25 +948,43 @@ namespace SmartPackager
                     Ipm6.PackUP(ref writer, t6);
                     Ipm7.PackUP(ref writer, t7);
                     Ipm8.PackUP(ref writer, t8);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
                 }
             }
         }
@@ -977,12 +1047,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    byte* point = dest;
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -992,7 +1061,7 @@ namespace SmartPackager
                     Ipm7.PackUP(ref writer, t7);
                     Ipm8.PackUP(ref writer, t8);
                     Ipm9.PackUP(ref writer, t9);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1000,9 +1069,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1012,26 +1081,46 @@ namespace SmartPackager
                     Ipm7.PackUP(ref writer, t7);
                     Ipm8.PackUP(ref writer, t8);
                     Ipm9.PackUP(ref writer, t9);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
                 }
             }
         }
@@ -1098,11 +1187,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1113,7 +1202,7 @@ namespace SmartPackager
                     Ipm8.PackUP(ref writer, t8);
                     Ipm9.PackUP(ref writer, t9);
                     Ipm10.PackUP(ref writer, t10);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1121,9 +1210,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1134,27 +1223,49 @@ namespace SmartPackager
                     Ipm8.PackUP(ref writer, t8);
                     Ipm9.PackUP(ref writer, t9);
                     Ipm10.PackUP(ref writer, t10);
-                }
-                return destination;
+                });
+                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
                 }
             }
         }
@@ -1225,11 +1336,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1241,7 +1352,7 @@ namespace SmartPackager
                     Ipm9.PackUP(ref writer, t9);
                     Ipm10.PackUP(ref writer, t10);
                     Ipm11.PackUP(ref writer, t11);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1249,9 +1360,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1263,28 +1374,52 @@ namespace SmartPackager
                     Ipm9.PackUP(ref writer, t9);
                     Ipm10.PackUP(ref writer, t10);
                     Ipm11.PackUP(ref writer, t11);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
                 }
             }
         }
@@ -1359,11 +1494,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1376,7 +1511,7 @@ namespace SmartPackager
                     Ipm10.PackUP(ref writer, t10);
                     Ipm11.PackUP(ref writer, t11);
                     Ipm12.PackUP(ref writer, t12);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1384,9 +1519,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1399,29 +1534,55 @@ namespace SmartPackager
                     Ipm10.PackUP(ref writer, t10);
                     Ipm11.PackUP(ref writer, t11);
                     Ipm12.PackUP(ref writer, t12);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
                 }
             }
         }
@@ -1500,11 +1661,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1518,7 +1679,7 @@ namespace SmartPackager
                     Ipm11.PackUP(ref writer, t11);
                     Ipm12.PackUP(ref writer, t12);
                     Ipm13.PackUP(ref writer, t13);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1526,9 +1687,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1542,30 +1703,58 @@ namespace SmartPackager
                     Ipm11.PackUP(ref writer, t11);
                     Ipm12.PackUP(ref writer, t12);
                     Ipm13.PackUP(ref writer, t13);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
                 }
             }
         }
@@ -1648,11 +1837,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1667,7 +1856,7 @@ namespace SmartPackager
                     Ipm12.PackUP(ref writer, t12);
                     Ipm13.PackUP(ref writer, t13);
                     Ipm14.PackUP(ref writer, t14);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1675,9 +1864,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1692,31 +1881,61 @@ namespace SmartPackager
                     Ipm12.PackUP(ref writer, t12);
                     Ipm13.PackUP(ref writer, t13);
                     Ipm14.PackUP(ref writer, t14);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    T14 t14_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                        Ipm14.UnPack(ref reader, out t14_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
+                    t14 = t14_;
                 }
             }
         }
@@ -1803,23 +2022,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-
-
-                }
-            }
-            /// <summary>
-            /// Packs data into an array
-            /// </summary>
-            public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
-            {
-                byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)];
-                fixed (byte* dest = &destination[0])
-                {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1835,32 +2042,90 @@ namespace SmartPackager
                     Ipm13.PackUP(ref writer, t13);
                     Ipm14.PackUP(ref writer, t14);
                     Ipm15.PackUP(ref writer, t15);
-                }
+                });
+            }
+            /// <summary>
+            /// Packs data into an array
+            /// </summary>
+            public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
+            {
+                byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)];
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                {
+                    StackWriter writer = new StackWriter(array);
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                    Ipm4.PackUP(ref writer, t4);
+                    Ipm5.PackUP(ref writer, t5);
+                    Ipm6.PackUP(ref writer, t6);
+                    Ipm7.PackUP(ref writer, t7);
+                    Ipm8.PackUP(ref writer, t8);
+                    Ipm9.PackUP(ref writer, t9);
+                    Ipm10.PackUP(ref writer, t10);
+                    Ipm11.PackUP(ref writer, t11);
+                    Ipm12.PackUP(ref writer, t12);
+                    Ipm13.PackUP(ref writer, t13);
+                    Ipm14.PackUP(ref writer, t14);
+                    Ipm15.PackUP(ref writer, t15);
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
-                    Ipm15.UnPack(ref reader, out t15);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    T14 t14_ = default;
+                    T15 t15_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                        Ipm14.UnPack(ref reader, out t14_);
+                        Ipm15.UnPack(ref reader, out t15_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
+                    t14 = t14_;
+                    t15 = t15_;
                 }
             }
         }
@@ -1951,11 +2216,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1972,7 +2237,7 @@ namespace SmartPackager
                     Ipm14.PackUP(ref writer, t14);
                     Ipm15.PackUP(ref writer, t15);
                     Ipm16.PackUP(ref writer, t16);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -1980,9 +2245,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -1999,33 +2264,67 @@ namespace SmartPackager
                     Ipm14.PackUP(ref writer, t14);
                     Ipm15.PackUP(ref writer, t15);
                     Ipm16.PackUP(ref writer, t16);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
-                    Ipm15.UnPack(ref reader, out t15);
-                    Ipm16.UnPack(ref reader, out t16);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    T14 t14_ = default;
+                    T15 t15_ = default;
+                    T16 t16_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                        Ipm14.UnPack(ref reader, out t14_);
+                        Ipm15.UnPack(ref reader, out t15_);
+                        Ipm16.UnPack(ref reader, out t16_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
+                    t14 = t14_;
+                    t15 = t15_;
+                    t16 = t16_;
                 }
             }
         }
@@ -2120,11 +2419,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2142,8 +2441,7 @@ namespace SmartPackager
                     Ipm15.PackUP(ref writer, t15);
                     Ipm16.PackUP(ref writer, t16);
                     Ipm17.PackUP(ref writer, t17);
- 
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -2151,9 +2449,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2171,34 +2469,70 @@ namespace SmartPackager
                     Ipm15.PackUP(ref writer, t15);
                     Ipm16.PackUP(ref writer, t16);
                     Ipm17.PackUP(ref writer, t17);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
-                    Ipm15.UnPack(ref reader, out t15);
-                    Ipm16.UnPack(ref reader, out t16);
-                    Ipm17.UnPack(ref reader, out t17);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    T14 t14_ = default;
+                    T15 t15_ = default;
+                    T16 t16_ = default;
+                    T17 t17_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                        Ipm14.UnPack(ref reader, out t14_);
+                        Ipm15.UnPack(ref reader, out t15_);
+                        Ipm16.UnPack(ref reader, out t16_);
+                        Ipm17.UnPack(ref reader, out t17_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
+                    t14 = t14_;
+                    t15 = t15_;
+                    t16 = t16_;
+                    t17 = t17_;
                 }
             }
         }
@@ -2292,17 +2626,17 @@ namespace SmartPackager
                 Ipm16.GetSize(ref meter, t16);
                 Ipm17.GetSize(ref meter, t17);
                 Ipm18.GetSize(ref meter, t18);
-               return meter.GetCalcLength();
+                return meter.GetCalcLength();
 
             }
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2321,7 +2655,7 @@ namespace SmartPackager
                     Ipm16.PackUP(ref writer, t16);
                     Ipm17.PackUP(ref writer, t17);
                     Ipm18.PackUP(ref writer, t18);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -2329,9 +2663,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2350,35 +2684,74 @@ namespace SmartPackager
                     Ipm16.PackUP(ref writer, t16);
                     Ipm17.PackUP(ref writer, t17);
                     Ipm18.PackUP(ref writer, t18);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
-                    Ipm15.UnPack(ref reader, out t15);
-                    Ipm16.UnPack(ref reader, out t16);
-                    Ipm17.UnPack(ref reader, out t17);
-                    Ipm18.UnPack(ref reader, out t18);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    T14 t14_ = default;
+                    T15 t15_ = default;
+                    T16 t16_ = default;
+                    T17 t17_ = default;
+                    T18 t18_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                        Ipm14.UnPack(ref reader, out t14_);
+                        Ipm15.UnPack(ref reader, out t15_);
+                        Ipm16.UnPack(ref reader, out t16_);
+                        Ipm17.UnPack(ref reader, out t17_);
+                        Ipm18.UnPack(ref reader, out t18_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
+                    t14 = t14_;
+                    t15 = t15_;
+                    t16 = t16_;
+                    t17 = t17_;
+                    t18 = t18_;
+
                 }
             }
         }
@@ -2481,11 +2854,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2505,7 +2878,7 @@ namespace SmartPackager
                     Ipm17.PackUP(ref writer, t17);
                     Ipm18.PackUP(ref writer, t18);
                     Ipm19.PackUP(ref writer, t19);
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -2513,9 +2886,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2535,36 +2908,77 @@ namespace SmartPackager
                     Ipm17.PackUP(ref writer, t17);
                     Ipm18.PackUP(ref writer, t18);
                     Ipm19.PackUP(ref writer, t19);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19)
             {
-                fixed (byte* dest = &source[offset])
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
-                    Ipm15.UnPack(ref reader, out t15);
-                    Ipm16.UnPack(ref reader, out t16);
-                    Ipm17.UnPack(ref reader, out t17);
-                    Ipm18.UnPack(ref reader, out t18);
-                    Ipm19.UnPack(ref reader, out t19);
+                    T1 t1_ = default;
+                    T2 t2_ = default;
+                    T3 t3_ = default;
+                    T4 t4_ = default;
+                    T5 t5_ = default;
+                    T6 t6_ = default;
+                    T7 t7_ = default;
+                    T8 t8_ = default;
+                    T9 t9_ = default;
+                    T10 t10_ = default;
+                    T11 t11_ = default;
+                    T12 t12_ = default;
+                    T13 t13_ = default;
+                    T14 t14_ = default;
+                    T15 t15_ = default;
+                    T16 t16_ = default;
+                    T17 t17_ = default;
+                    T18 t18_ = default;
+                    T19 t19_ = default;
+                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    {
+                        StackReader reader = new StackReader(array);
+                        Ipm1.UnPack(ref reader, out t1_);
+                        Ipm2.UnPack(ref reader, out t2_);
+                        Ipm3.UnPack(ref reader, out t3_);
+                        Ipm4.UnPack(ref reader, out t4_);
+                        Ipm5.UnPack(ref reader, out t5_);
+                        Ipm6.UnPack(ref reader, out t6_);
+                        Ipm7.UnPack(ref reader, out t7_);
+                        Ipm8.UnPack(ref reader, out t8_);
+                        Ipm9.UnPack(ref reader, out t9_);
+                        Ipm10.UnPack(ref reader, out t10_);
+                        Ipm11.UnPack(ref reader, out t11_);
+                        Ipm12.UnPack(ref reader, out t12_);
+                        Ipm13.UnPack(ref reader, out t13_);
+                        Ipm14.UnPack(ref reader, out t14_);
+                        Ipm15.UnPack(ref reader, out t15_);
+                        Ipm16.UnPack(ref reader, out t16_);
+                        Ipm17.UnPack(ref reader, out t17_);
+                        Ipm18.UnPack(ref reader, out t18_);
+                        Ipm19.UnPack(ref reader, out t19_);
+                    });
+                    t1 = t1_;
+                    t2 = t2_;
+                    t3 = t3_;
+                    t4 = t4_;
+                    t5 = t5_;
+                    t6 = t6_;
+                    t7 = t7_;
+                    t8 = t8_;
+                    t9 = t9_;
+                    t10 = t10_;
+                    t11 = t11_;
+                    t12 = t12_;
+                    t13 = t13_;
+                    t14 = t14_;
+                    t15 = t15_;
+                    t16 = t16_;
+                    t17 = t17_;
+                    t18 = t18_;
+                    t19 = t19_;
+
                 }
             }
         }
@@ -2671,11 +3085,11 @@ namespace SmartPackager
             /// <summary>
             /// Packs data into an array
             /// </summary>
-            public unsafe void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
-                fixed (byte* dest = &destination[offset])
+                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2696,8 +3110,7 @@ namespace SmartPackager
                     Ipm18.PackUP(ref writer, t18);
                     Ipm19.PackUP(ref writer, t19);
                     Ipm20.PackUP(ref writer, t20);
-
-                }
+                });
             }
             /// <summary>
             /// Packs data into an array
@@ -2705,9 +3118,9 @@ namespace SmartPackager
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)];
-                fixed (byte* dest = &destination[0])
+                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
                 {
-                    StackWriter writer = new StackWriter();
+                    StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                     Ipm2.PackUP(ref writer, t2);
                     Ipm3.PackUP(ref writer, t3);
@@ -2728,38 +3141,79 @@ namespace SmartPackager
                     Ipm18.PackUP(ref writer, t18);
                     Ipm19.PackUP(ref writer, t19);
                     Ipm20.PackUP(ref writer, t20);
-                }
+                });
                 return destination;
             }
             /// <summary>
             /// Unpacks data from an array
             /// </summary>
-            public unsafe void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19, out T20 t20)
+            public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19, out T20 t20)
             {
-                fixed (byte* dest = &source[offset])
+                T1 t1_ = default;
+                T2 t2_ = default;
+                T3 t3_ = default;
+                T4 t4_ = default;
+                T5 t5_ = default;
+                T6 t6_ = default;
+                T7 t7_ = default;
+                T8 t8_ = default;
+                T9 t9_ = default;
+                T10 t10_ = default;
+                T11 t11_ = default;
+                T12 t12_ = default;
+                T13 t13_ = default;
+                T14 t14_ = default;
+                T15 t15_ = default;
+                T16 t16_ = default;
+                T17 t17_ = default;
+                T18 t18_ = default;
+                T19 t19_ = default;
+                T20 t20_ = default;
+                UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
                 {
-                    StackReader reader = new StackReader();
-                    Ipm1.UnPack(ref reader, out t1);
-                    Ipm2.UnPack(ref reader, out t2);
-                    Ipm3.UnPack(ref reader, out t3);
-                    Ipm4.UnPack(ref reader, out t4);
-                    Ipm5.UnPack(ref reader, out t5);
-                    Ipm6.UnPack(ref reader, out t6);
-                    Ipm7.UnPack(ref reader, out t7);
-                    Ipm8.UnPack(ref reader, out t8);
-                    Ipm9.UnPack(ref reader, out t9);
-                    Ipm10.UnPack(ref reader, out t10);
-                    Ipm11.UnPack(ref reader, out t11);
-                    Ipm12.UnPack(ref reader, out t12);
-                    Ipm13.UnPack(ref reader, out t13);
-                    Ipm14.UnPack(ref reader, out t14);
-                    Ipm15.UnPack(ref reader, out t15);
-                    Ipm16.UnPack(ref reader, out t16);
-                    Ipm17.UnPack(ref reader, out t17);
-                    Ipm18.UnPack(ref reader, out t18);
-                    Ipm19.UnPack(ref reader, out t19);
-                    Ipm20.UnPack(ref reader, out t20);
-                }
+                    StackReader reader = new StackReader(array);
+                    Ipm1.UnPack(ref reader, out t1_);
+                    Ipm2.UnPack(ref reader, out t2_);
+                    Ipm3.UnPack(ref reader, out t3_);
+                    Ipm4.UnPack(ref reader, out t4_);
+                    Ipm5.UnPack(ref reader, out t5_);
+                    Ipm6.UnPack(ref reader, out t6_);
+                    Ipm7.UnPack(ref reader, out t7_);
+                    Ipm8.UnPack(ref reader, out t8_);
+                    Ipm9.UnPack(ref reader, out t9_);
+                    Ipm10.UnPack(ref reader, out t10_);
+                    Ipm11.UnPack(ref reader, out t11_);
+                    Ipm12.UnPack(ref reader, out t12_);
+                    Ipm13.UnPack(ref reader, out t13_);
+                    Ipm14.UnPack(ref reader, out t14_);
+                    Ipm15.UnPack(ref reader, out t15_);
+                    Ipm16.UnPack(ref reader, out t16_);
+                    Ipm17.UnPack(ref reader, out t17_);
+                    Ipm18.UnPack(ref reader, out t18_);
+                    Ipm19.UnPack(ref reader, out t19_);
+                    Ipm20.UnPack(ref reader, out t20_);
+                });
+                t1 = t1_;
+                t2 = t2_;
+                t3 = t3_;
+                t4 = t4_;
+                t5 = t5_;
+                t6 = t6_;
+                t7 = t7_;
+                t8 = t8_;
+                t9 = t9_;
+                t10 = t10_;
+                t11 = t11_;
+                t12 = t12_;
+                t13 = t13_;
+                t14 = t14_;
+                t15 = t15_;
+                t16 = t16_;
+                t17 = t17_;
+                t18 = t18_;
+                t19 = t19_;
+                t20 = t20_;
+
             }
         }
         #endregion
