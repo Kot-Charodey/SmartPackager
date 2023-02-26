@@ -6,7 +6,7 @@ namespace SmartPackager
     using ByteStack;
 
     /// <summary>
-    /// Creates a packer for the selected set of types
+    /// Создает упаковщик для выбранного набора типов
     /// </summary>
     public static class Packager
     {
@@ -61,7 +61,7 @@ namespace SmartPackager
 
         #region Utilites
         /// <summary>
-        /// Does this type have a static size
+        ///Имеет ли этот тип статический размер
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -73,7 +73,7 @@ namespace SmartPackager
 
         #region Create
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1> Create<T1>()
@@ -81,7 +81,7 @@ namespace SmartPackager
             return new M<T1>(GetMethod<T1>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2> Create<T1, T2>()
@@ -89,7 +89,7 @@ namespace SmartPackager
             return new M<T1, T2>(GetMethod<T1>(), GetMethod<T2>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3> Create<T1, T2, T3>()
@@ -97,7 +97,7 @@ namespace SmartPackager
             return new M<T1, T2, T3>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4> Create<T1, T2, T3, T4>()
@@ -105,7 +105,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5> Create<T1, T2, T3, T4, T5>()
@@ -113,7 +113,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6> Create<T1, T2, T3, T4, T5, T6>()
@@ -121,7 +121,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7> Create<T1, T2, T3, T4, T5, T6, T7>()
@@ -129,7 +129,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8> Create<T1, T2, T3, T4, T5, T6, T7, T8>()
@@ -137,7 +137,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9>()
@@ -145,7 +145,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>()
@@ -153,7 +153,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>()
@@ -161,7 +161,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>()
@@ -169,7 +169,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>()
@@ -177,7 +177,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>()
@@ -185,7 +185,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>()
@@ -193,7 +193,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>()
@@ -201,7 +201,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>()
@@ -209,7 +209,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>()
@@ -217,7 +217,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>(), GetMethod<T18>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>()
@@ -225,7 +225,7 @@ namespace SmartPackager
             return new M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(GetMethod<T1>(), GetMethod<T2>(), GetMethod<T3>(), GetMethod<T4>(), GetMethod<T5>(), GetMethod<T6>(), GetMethod<T7>(), GetMethod<T8>(), GetMethod<T9>(), GetMethod<T10>(), GetMethod<T11>(), GetMethod<T12>(), GetMethod<T13>(), GetMethod<T14>(), GetMethod<T15>(), GetMethod<T16>(), GetMethod<T17>(), GetMethod<T18>(), GetMethod<T19>());
         }
         /// <summary>
-        /// Creates a packer for the selected set of types
+        /// Создает упаковщик для выбранного набора типов
         /// </summary>
         /// <returns>packer</returns>
         public static M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>()
@@ -239,7 +239,7 @@ namespace SmartPackager
 
         #region M1
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1>
         {
@@ -251,7 +251,7 @@ namespace SmartPackager
                 Ipm1 = ipm1;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1)
@@ -261,23 +261,23 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public byte[] PackUP(T1 t1)
             {
                 byte[] destination = new byte[CalcNeedSize(t1)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -285,12 +285,12 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1)
             {
                 T1 t1_ = default;
-                UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                 {
                     StackReader reader = new StackReader(array);
                     Ipm1.UnPack(ref reader, out t1_);
@@ -301,7 +301,7 @@ namespace SmartPackager
         #endregion
         #region M2
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2>
         {
@@ -316,7 +316,7 @@ namespace SmartPackager
                 Ipm2 = ipm2;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2)
@@ -329,11 +329,11 @@ namespace SmartPackager
 
 
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -341,12 +341,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -357,13 +357,13 @@ namespace SmartPackager
 
 
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2)
             {
                 T1 t1_ = default;
                 T2 t2_ = default;
-                UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                 {
                     StackReader reader = new StackReader(array);
                     Ipm1.UnPack(ref reader, out t1_);
@@ -376,7 +376,7 @@ namespace SmartPackager
         #endregion
         #region M3
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3>
         {
@@ -394,7 +394,7 @@ namespace SmartPackager
                 Ipm3 = ipm3;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3)
@@ -406,13 +406,13 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3)];
                 fixed (byte* dest = &destination[0])
-                    UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                     {
                         StackWriter writer = new StackWriter(array);
                         Ipm1.PackUP(ref writer, t1);
@@ -422,7 +422,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3)
             {
@@ -430,7 +430,7 @@ namespace SmartPackager
                     T1 t1_ = default;
                     T2 t2_ = default;
                     T3 t3_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -446,7 +446,7 @@ namespace SmartPackager
         #endregion
         #region M4
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4>
         {
@@ -467,7 +467,7 @@ namespace SmartPackager
                 Ipm4 = ipm4;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4)
@@ -480,11 +480,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -494,12 +494,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -510,7 +510,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4)
             {
@@ -519,7 +519,7 @@ namespace SmartPackager
                     T2 t2_ = default;
                     T3 t3_ = default;
                     T4 t4_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -537,7 +537,7 @@ namespace SmartPackager
         #endregion
         #region M5
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5>
         {
@@ -561,7 +561,7 @@ namespace SmartPackager
                 Ipm5 = ipm5;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
@@ -575,11 +575,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -590,12 +590,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -607,7 +607,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5)
             {
@@ -617,7 +617,7 @@ namespace SmartPackager
                     T3 t3_ = default;
                     T4 t4_ = default;
                     T5 t5_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -637,7 +637,7 @@ namespace SmartPackager
         #endregion
         #region M6
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6>
         {
@@ -664,7 +664,7 @@ namespace SmartPackager
                 Ipm6 = ipm6;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
@@ -679,11 +679,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -695,12 +695,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -713,7 +713,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6)
             {
@@ -724,7 +724,7 @@ namespace SmartPackager
                     T4 t4_ = default;
                     T5 t5_ = default;
                     T6 t6_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -746,7 +746,7 @@ namespace SmartPackager
         #endregion
         #region M7
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7>
         {
@@ -776,7 +776,7 @@ namespace SmartPackager
                 Ipm7 = ipm7;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
@@ -792,11 +792,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -809,12 +809,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -828,7 +828,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7)
             {
@@ -840,7 +840,7 @@ namespace SmartPackager
                     T5 t5_ = default;
                     T6 t6_ = default;
                     T7 t7_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -864,7 +864,7 @@ namespace SmartPackager
         #endregion
         #region M8
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8>
         {
@@ -897,7 +897,7 @@ namespace SmartPackager
                 Ipm8 = ipm8;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
@@ -914,11 +914,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -932,12 +932,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -952,7 +952,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8)
             {
@@ -965,7 +965,7 @@ namespace SmartPackager
                     T6 t6_ = default;
                     T7 t7_ = default;
                     T8 t8_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -991,7 +991,7 @@ namespace SmartPackager
         #endregion
         #region M9
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9>
         {
@@ -1027,7 +1027,7 @@ namespace SmartPackager
                 Ipm9 = ipm9;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
@@ -1045,11 +1045,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1064,12 +1064,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1085,7 +1085,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9)
             {
@@ -1099,7 +1099,7 @@ namespace SmartPackager
                     T7 t7_ = default;
                     T8 t8_ = default;
                     T9 t9_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -1127,7 +1127,7 @@ namespace SmartPackager
         #endregion
         #region M10
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
         {
@@ -1166,7 +1166,7 @@ namespace SmartPackager
                 Ipm10 = ipm10;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
@@ -1185,11 +1185,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1205,12 +1205,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1227,7 +1227,7 @@ namespace SmartPackager
                  return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10)
             {
@@ -1242,7 +1242,7 @@ namespace SmartPackager
                     T8 t8_ = default;
                     T9 t9_ = default;
                     T10 t10_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -1272,7 +1272,7 @@ namespace SmartPackager
         #endregion
         #region M11
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
         {
@@ -1314,7 +1314,7 @@ namespace SmartPackager
                 Ipm11 = ipm11;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
@@ -1334,11 +1334,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1355,12 +1355,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1378,7 +1378,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11)
             {
@@ -1394,7 +1394,7 @@ namespace SmartPackager
                     T9 t9_ = default;
                     T10 t10_ = default;
                     T11 t11_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -1426,7 +1426,7 @@ namespace SmartPackager
         #endregion
         #region M12
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
         {
@@ -1471,7 +1471,7 @@ namespace SmartPackager
                 Ipm12 = ipm12;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
@@ -1492,11 +1492,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1514,12 +1514,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1538,7 +1538,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12)
             {
@@ -1555,7 +1555,7 @@ namespace SmartPackager
                     T10 t10_ = default;
                     T11 t11_ = default;
                     T12 t12_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -1589,7 +1589,7 @@ namespace SmartPackager
         #endregion
         #region M13
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
         {
@@ -1637,7 +1637,7 @@ namespace SmartPackager
                 Ipm13 = ipm13;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
@@ -1659,11 +1659,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1682,12 +1682,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1707,7 +1707,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13)
             {
@@ -1725,7 +1725,7 @@ namespace SmartPackager
                     T11 t11_ = default;
                     T12 t12_ = default;
                     T13 t13_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -1761,7 +1761,7 @@ namespace SmartPackager
         #endregion
         #region M14
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
         {
@@ -1812,7 +1812,7 @@ namespace SmartPackager
                 Ipm14 = ipm14;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
@@ -1835,11 +1835,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1859,12 +1859,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -1885,7 +1885,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14)
             {
@@ -1904,7 +1904,7 @@ namespace SmartPackager
                     T12 t12_ = default;
                     T13 t13_ = default;
                     T14 t14_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -1942,7 +1942,7 @@ namespace SmartPackager
         #endregion
         #region M15
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
         {
@@ -1996,7 +1996,7 @@ namespace SmartPackager
                 Ipm15 = ipm15;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
@@ -2020,11 +2020,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2045,12 +2045,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2072,7 +2072,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15)
             {
@@ -2092,7 +2092,7 @@ namespace SmartPackager
                     T13 t13_ = default;
                     T14 t14_ = default;
                     T15 t15_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -2132,7 +2132,7 @@ namespace SmartPackager
         #endregion
         #region M16
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
         {
@@ -2189,7 +2189,7 @@ namespace SmartPackager
                 Ipm16 = ipm16;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
@@ -2214,11 +2214,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2240,12 +2240,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2268,7 +2268,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16)
             {
@@ -2289,7 +2289,7 @@ namespace SmartPackager
                     T14 t14_ = default;
                     T15 t15_ = default;
                     T16 t16_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -2331,7 +2331,7 @@ namespace SmartPackager
         #endregion
         #region M17
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>
         {
@@ -2391,7 +2391,7 @@ namespace SmartPackager
                 Ipm17 = ipm17;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
@@ -2417,11 +2417,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2444,12 +2444,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2473,7 +2473,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17)
             {
@@ -2495,7 +2495,7 @@ namespace SmartPackager
                     T15 t15_ = default;
                     T16 t16_ = default;
                     T17 t17_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -2539,7 +2539,7 @@ namespace SmartPackager
         #endregion
         #region M18
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>
         {
@@ -2602,7 +2602,7 @@ namespace SmartPackager
                 Ipm18 = ipm18;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
@@ -2630,11 +2630,11 @@ namespace SmartPackager
 
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2658,12 +2658,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2688,7 +2688,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18)
             {
@@ -2711,7 +2711,7 @@ namespace SmartPackager
                     T16 t16_ = default;
                     T17 t17_ = default;
                     T18 t18_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -2758,7 +2758,7 @@ namespace SmartPackager
         #endregion
         #region M19
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>
         {
@@ -2824,7 +2824,7 @@ namespace SmartPackager
                 Ipm19 = ipm19;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
@@ -2852,11 +2852,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2881,12 +2881,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -2912,7 +2912,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19)
             {
@@ -2936,7 +2936,7 @@ namespace SmartPackager
                     T17 t17_ = default;
                     T18 t18_ = default;
                     T19 t19_ = default;
-                    UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                    UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                     {
                         StackReader reader = new StackReader(array);
                         Ipm1.UnPack(ref reader, out t1_);
@@ -2985,7 +2985,7 @@ namespace SmartPackager
         #endregion
         #region M20
         /// <summary>
-        /// Packer
+        /// Упаковщик
         /// </summary>
         public class M<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>
         {
@@ -3054,7 +3054,7 @@ namespace SmartPackager
                 Ipm20 = ipm20;
             }
             /// <summary>
-            /// Сalculates the required array size for packing
+            /// Вычисляет необходимый размер массива для упаковки
             /// </summary>
             /// <returns></returns>
             public int CalcNeedSize(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
@@ -3083,11 +3083,11 @@ namespace SmartPackager
                 return meter.GetCalcLength();
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
-                UnsafeArray.UseArray(destination, offset, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -3113,12 +3113,12 @@ namespace SmartPackager
                 });
             }
             /// <summary>
-            /// Packs data into an array
+            /// Упаковывает данные в массив
             /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)];
-                UnsafeArray.UseArray(destination, 0, destination.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(destination, 0, (ref UnsafeArray array) =>
                 {
                     StackWriter writer = new StackWriter(array);
                     Ipm1.PackUP(ref writer, t1);
@@ -3145,7 +3145,7 @@ namespace SmartPackager
                 return destination;
             }
             /// <summary>
-            /// Unpacks data from an array
+            /// Распаковывает данные из массива
             /// </summary>
             public void UnPack(byte[] source, int offset, out T1 t1, out T2 t2, out T3 t3, out T4 t4, out T5 t5, out T6 t6, out T7 t7, out T8 t8, out T9 t9, out T10 t10, out T11 t11, out T12 t12, out T13 t13, out T14 t14, out T15 t15, out T16 t16, out T17 t17, out T18 t18, out T19 t19, out T20 t20)
             {
@@ -3169,7 +3169,7 @@ namespace SmartPackager
                 T18 t18_ = default;
                 T19 t19_ = default;
                 T20 t20_ = default;
-                UnsafeArray.UseArray(source, offset, source.Length, (ref UnsafeArray array) =>
+                UnsafeArray.UseArray(source, offset, (ref UnsafeArray array) =>
                 {
                     StackReader reader = new StackReader(array);
                     Ipm1.UnPack(ref reader, out t1_);

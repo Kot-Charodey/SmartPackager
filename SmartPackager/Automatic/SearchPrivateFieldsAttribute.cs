@@ -3,7 +3,7 @@
 namespace SmartPackager.Automatic
 {
     /// <summary>
-    /// Indicates to the automatic packaging generator that it is worth packing private fields
+    /// Указывает автоматическому генератору упаковки, что стоит упаковать частные поля
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class SearchPrivateFieldsAttribute : Attribute

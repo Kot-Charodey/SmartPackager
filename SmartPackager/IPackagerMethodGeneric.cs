@@ -3,17 +3,17 @@
 namespace SmartPackager
 {
     /// <summary>
-    /// Auxiliary wrapper type for "IPackagerMethod"
+    /// Вспомогательный тип оболочки для "IPackagerMethod"
     /// </summary>
     public interface IPackagerMethodGeneric
     {
         /// <summary>
-        /// Target Type
+        /// Целевой тип
         /// </summary>
         Type TargetType { get; }
 
         /// <summary>
-        /// Does the type have a fixed size
+        /// Имеет ли тип фиксированный размер
         /// </summary>
         bool IsFixedSize { get; }
     }

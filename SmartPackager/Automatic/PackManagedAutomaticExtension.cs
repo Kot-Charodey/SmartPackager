@@ -12,7 +12,7 @@ namespace SmartPackager.Automatic
         internal static readonly Dictionary<Type, IPackagerMethodGeneric> Cash = new Dictionary<Type, IPackagerMethodGeneric>();
 
         /// <summary>
-        /// Tries to create an unpacking method for a managed type
+        /// Пытается создать метод распаковки для управляемого типа
         /// </summary>
         /// <typeparam name="T">target type</typeparam>
         /// <returns></returns>

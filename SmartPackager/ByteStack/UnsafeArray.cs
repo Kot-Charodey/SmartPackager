@@ -24,14 +24,14 @@ namespace SmartPackager.ByteStack
         /// </summary>
         /// <param name="array">массив который будет использоваться</param>
         /// <param name="offset">смещение отностительно массива</param>
-        /// <param name="length">размер неуправляймого массива</param>
         /// <param name="action">делегат в котором будет доступен данный массив для использования (будет вызван сразу)</param>
         /// <exception cref="ArgumentOutOfRangeException">возникнет при выходи смещения и указанной длинны за границы массива </exception>
-        public static void UseArray(byte[] array, int offset, int length, UnsafeArrayAction action)
+        public static void UseArray(byte[] array, int offset, UnsafeArrayAction action)
         {
             lock (array)
             {
-                if (array.Length - offset < length)
+                int length = array.Length - offset;
+                if (length<1)
                     throw new ArgumentOutOfRangeException("SmartPackager => incorrect data");
                 fixed (byte* p = array)
                 {
@@ -50,7 +50,7 @@ namespace SmartPackager.ByteStack
         /// <summary>
         /// Генерирует ошибку если функция была вызвана за пределами делегата вызова
         /// </summary>
-        /// <see cref="UseArray(byte[], int, int, UnsafeArrayAction)"/>
+        /// <see cref="UseArray(byte[], int, UnsafeArrayAction)"/>
         /// <exception cref="InvalidOperationException">массив может использоваться только в функции делегата</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void TrowUse()

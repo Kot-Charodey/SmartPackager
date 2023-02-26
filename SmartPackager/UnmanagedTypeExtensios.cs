@@ -6,14 +6,14 @@ using System.Reflection;
 namespace SmartPackager
 {
     /// <summary>
-    /// Сhecks if the type is managed
+    /// Проверяет, является ли тип управляемым
     /// </summary>
     public static class UnmanagedTypeExtensios
     {
         private static readonly Dictionary<int, bool> cachedTypes = new Dictionary<int, bool>();
 
         /// <summary>
-        /// Checks if the type is managed
+        /// Проверяет, является ли тип управляемым
         /// </summary>
         /// <param name="t"></param>
         /// <returns>returned true if type is unmanaged</returns>

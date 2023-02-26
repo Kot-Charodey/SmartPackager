@@ -14,7 +14,7 @@ namespace SmartPackager.Automatic
         public static Dictionary<Type, IPackagerMethodGeneric> Cache = new Dictionary<Type, IPackagerMethodGeneric>();
 
         /// <summary>
-        /// Creates a variant of the universal type
+        /// Создает вариант универсального типа
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>

@@ -3,7 +3,7 @@
 namespace SmartPackager.Automatic
 {
     /// <summary>
-    /// Specifies that this field or property should not be packaged
+    /// Указывает, что это поле или свойство не должно быть упаковано
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class NotPackAttribute : Attribute

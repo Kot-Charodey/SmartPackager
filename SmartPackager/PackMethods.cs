@@ -5,7 +5,7 @@ using System.Linq;
 namespace SmartPackager
 {
     /// <summary>
-    /// Searches for and initializes packaging methods
+    /// Выполняет поиск и инициализацию методов упаковки
     /// </summary>
     public static class PackMethods
     {
@@ -24,7 +24,7 @@ namespace SmartPackager
         }
 
         /// <summary>
-        /// loads data type packaging implementations
+        /// загружает реализации упаковки типов данных
         /// </summary>
         internal static void SetupPackMethods()
         {
@@ -102,7 +102,7 @@ namespace SmartPackager
         }
 
         /// <summary>
-        /// if any of the packaging classes were skipped you can start the search function again
+        /// если какой-либо из классов упаковки был пропущен, вы можете снова запустить функцию поиска
         /// </summary>
         public static void SetupAgainPackMethods()
         {
@@ -111,7 +111,7 @@ namespace SmartPackager
         }
 
         /// <summary>
-        /// returns all packing methods *[unmanaged types generated automatically are not included]
+        /// возвращает все методы упаковки * [неуправляемые типы, созданные автоматически, не включены]
         /// </summary>
         /// <returns>all packing methods</returns>
         public static IPackagerMethodGeneric[] GetPackMethods()
@@ -120,7 +120,7 @@ namespace SmartPackager
         }
 
         /// <summary>
-        /// Unmanaged types generated automatically
+        /// Неуправляемые типы, генерируемые автоматически
         /// </summary>
         /// <returns></returns>
         public static IPackagerMethodGeneric[] GetPackagerMethodsUnmanagedTypes()
@@ -129,7 +129,7 @@ namespace SmartPackager
         }
 
         /// <summary>
-        /// Managed types generaded automatically
+        /// Управляемые типы генерируются автоматически
         /// </summary>
         /// <returns></returns>
         public static IPackagerMethodGeneric[] GetPackagerMethodsManagedTypes()
