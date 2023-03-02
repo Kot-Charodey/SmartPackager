@@ -11,7 +11,7 @@ namespace SmartPackager.ByteStack
     internal delegate void UnsafeArrayAction(ref UnsafeArray array);
 
     /// <summary>
-    /// Позволяет отночительно безопасно работать с регмоном памяти (запись чтение неуправляймых типов)
+    /// Позволяет относительно безопасно работать с регмоном памяти (запись чтение неуправляймых типов)
     /// </summary>
     internal unsafe struct UnsafeArray
     {
