@@ -23,7 +23,7 @@ namespace UnitTest
         public void Test_SetGetNum()
         {
             byte[] bytes = new byte[1024];
-            UnsafeArray.UseArray(bytes, 0, 8, (ref UnsafeArray uArray) =>
+            UnsafeArray.UseArray(bytes, 0, (ref UnsafeArray uArray) =>
             {
                 int a = 15;
                 int b = int.MaxValue;
@@ -38,7 +38,7 @@ namespace UnitTest
         public void Test_SetGetNum_Error()
         {
             byte[] bytes = new byte[1024];
-            UnsafeArray.UseArray(bytes, 0, 0, (ref UnsafeArray uArray) =>
+            UnsafeArray.UseArray(bytes, 0, (ref UnsafeArray uArray) =>
             {
                 int a = 15;
                 InvokeIsError(ref uArray, (ref UnsafeArray arr) => arr.Set(4, a));
@@ -51,7 +51,7 @@ namespace UnitTest
         public void Test_SetGetArrayNum()
         {
             byte[] bytes = new byte[1024];
-            UnsafeArray.UseArray(bytes, 0, 4*5, (ref UnsafeArray uArray) =>
+            UnsafeArray.UseArray(bytes, 0, (ref UnsafeArray uArray) =>
             {
                 int[] a = { int.MaxValue, int.MinValue, 3, 25, -0 };
                 uArray.Set(0, a);
@@ -64,7 +64,7 @@ namespace UnitTest
         public void Test_SetGetArrayNum_Error()
         {
             byte[] bytes = new byte[1024];
-            UnsafeArray.UseArray(bytes, 0, 4 * 5, (ref UnsafeArray uArray) =>
+            UnsafeArray.UseArray(bytes, 0, (ref UnsafeArray uArray) =>
             {
                 int[] a = { int.MaxValue, int.MinValue, 3, 25, -0 };
                 InvokeIsError(ref uArray, (ref UnsafeArray arr) => arr.Set(1, a));

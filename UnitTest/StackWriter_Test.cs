@@ -11,7 +11,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_WriteNum()
         {
-            UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(new byte[512], 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 writer.Write(1);
@@ -27,7 +27,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_WriteArrayNum()
         {
-            UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(new byte[512], 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 writer.Write(new int[] { 1, 2, 3, 4, 5 });
@@ -38,7 +38,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_WriteLength()
         {
-            UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(new byte[512], 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 writer.WriteLength(55);
@@ -49,7 +49,7 @@ namespace UnitTest
         [TestMethod]
         public void Test_WriteReference()
         {
-            UnsafeArray.UseArray(new byte[512], 0, 512, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(new byte[512], 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 object obA = new();

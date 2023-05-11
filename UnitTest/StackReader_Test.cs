@@ -13,7 +13,7 @@ namespace UnitTest
         public void Test_ReadNum()
         {
             var arr = new byte[512];
-            UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(arr, 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 writer.Write(1);
@@ -21,7 +21,7 @@ namespace UnitTest
                 writer.Write(3);
             });
 
-            UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(arr, 0, (ref UnsafeArray array) =>
             {
                 StackReader reader = new(array);
                 Assert.AreEqual(reader.Read<int>(), 1);
@@ -35,13 +35,13 @@ namespace UnitTest
         {
             var arr = new byte[512];
             var testArr = new int[] { 1, 2, 3, 4, 5 };
-            UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(arr, 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 writer.Write(testArr);
             });
 
-            UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(arr, 0, (ref UnsafeArray array) =>
             {
                 StackReader reader = new(array);
                 CollectionAssert.AreEqual(reader.Read<int>(testArr.Length), testArr);
@@ -52,7 +52,7 @@ namespace UnitTest
         public void Test_ReadLength()
         {
             var arr = new byte[512];
-            UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(arr, 0, (ref UnsafeArray array) =>
             {
                 StackWriter writer = new(array);
                 writer.WriteLength(5);
@@ -60,7 +60,7 @@ namespace UnitTest
                 writer.WriteLength(-1);
             });
 
-            UnsafeArray.UseArray(arr, 0, arr.Length, (ref UnsafeArray array) =>
+            UnsafeArray.UseArray(arr, 0, (ref UnsafeArray array) =>
             {
                 StackReader reader = new(array);
                 Assert.AreEqual(reader.ReadLength(), 5);
