@@ -408,6 +408,19 @@ namespace SmartPackager
             /// <summary>
             /// Упаковывает данные в массив
             /// </summary>
+            public void PackUP(byte[] destination, int offset, T1 t1, T2 t2, T3 t3)
+            {
+                UnsafeArray.UseArray(destination, offset, (ref UnsafeArray array) =>
+                {
+                    StackWriter writer = new StackWriter(array);
+                    Ipm1.PackUP(ref writer, t1);
+                    Ipm2.PackUP(ref writer, t2);
+                    Ipm3.PackUP(ref writer, t3);
+                });
+            }
+            /// <summary>
+            /// Упаковывает данные в массив
+            /// </summary>
             public unsafe byte[] PackUP(T1 t1, T2 t2, T3 t3)
             {
                 byte[] destination = new byte[CalcNeedSize(t1, t2, t3)];
